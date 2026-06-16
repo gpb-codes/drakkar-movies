@@ -129,6 +129,31 @@ export default function Navbar() {
 
       {mobileOpen && <div className="nb__overlay" onClick={() => setMobileOpen(false)} />}
 
+      {/* Bottom Nav - Mobile */}
+      <nav className="nb-bottom">
+        <Link to="/" className={`nb-bottom__item ${location.pathname === '/' ? 'nb-bottom__item--on' : ''}`}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          <span>{t('nav.inicio')}</span>
+        </Link>
+        <Link to="/series" className={`nb-bottom__item ${location.pathname === '/series' ? 'nb-bottom__item--on' : ''}`}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+          <span>{t('nav.series')}</span>
+        </Link>
+        <Link to="/search" className={`nb-bottom__item ${location.pathname === '/search' ? 'nb-bottom__item--on' : ''}`}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <span>{t('nav.buscar')}</span>
+        </Link>
+        <Link to="/watchlist" className={`nb-bottom__item ${location.pathname === '/watchlist' ? 'nb-bottom__item--on' : ''}`}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          <span>{t('nav.miLista')}</span>
+          {watchlist.length > 0 && <span className="nb-bottom__dot">{watchlist.length}</span>}
+        </Link>
+        <a href={DONATION_CONFIG.paypalUrl} target="_blank" rel="noopener noreferrer" className="nb-bottom__item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span>{t('nav.donar')}</span>
+        </a>
+      </nav>
+
       <style>{`
         .nb {
           --h: 56px;
@@ -354,6 +379,58 @@ export default function Navbar() {
           }
           .nb__genre { justify-content: center; font-size: 0.72rem; padding: 10px 6px; }
           .nb__overlay { display: block; }
+        }
+
+        /* Bottom Nav - Mobile */
+        .nb-bottom {
+          display: none;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 60px;
+          background: rgba(6,2,15,0.95);
+          backdrop-filter: blur(24px) saturate(1.6);
+          border-top: 1px solid rgba(168,85,247,0.1);
+          z-index: 1000;
+          justify-content: space-around;
+          align-items: center;
+          padding: 0 8px;
+          padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+        .nb-bottom__item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 3px;
+          padding: 6px 10px;
+          text-decoration: none;
+          color: var(--text-muted);
+          font-size: 0.55rem;
+          font-weight: 600;
+          border-radius: 10px;
+          transition: all 0.2s;
+          position: relative;
+          min-width: 52px;
+        }
+        .nb-bottom__item svg { width: 20px; height: 20px; }
+        .nb-bottom__item--on { color: var(--accent-purple-light); }
+        .nb-bottom__item--on svg { filter: drop-shadow(0 0 6px rgba(168,85,247,0.4)); }
+        .nb-bottom__dot {
+          position: absolute;
+          top: 2px;
+          right: 6px;
+          font-size: 0.5rem;
+          font-weight: 700;
+          background: var(--accent-gold);
+          color: #000;
+          padding: 1px 4px;
+          border-radius: 6px;
+          line-height: 1;
+        }
+
+        @media (max-width: 768px) {
+          .nb-bottom { display: flex; }
         }
       `}</style>
     </>

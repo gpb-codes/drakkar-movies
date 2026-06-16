@@ -81,6 +81,12 @@ const translations: Record<Lang, Record<string, string>> = {
     'detail.calificaciones': 'Calificaciones',
     'detail.seguirViendo': 'Seguir Viendo',
     'detail.continueWatching': 'Continue Watching',
+    'detail.idiomasDisponibles': 'Idiomas Disponibles',
+    'detail.audioOriginal': 'Audio Original',
+    'detail.subtitulos': 'Subtítulos',
+    'detail.disponibleEnReproductor': 'Disponible en el reproductor',
+    'detail.cambiarIdioma': 'Cambiar Idioma',
+    'detail.usarConfigReproductor': 'Usa el ícono de configuración del reproductor para cambiar audio y subtítulos',
 
     // Player
     'player.servidor1': 'Servidor 1',
@@ -200,6 +206,12 @@ const translations: Record<Lang, Record<string, string>> = {
     'detail.calificaciones': 'Ratings',
     'detail.seguirViendo': 'Continue Watching',
     'detail.continueWatching': 'Continue Watching',
+    'detail.idiomasDisponibles': 'Available Languages',
+    'detail.audioOriginal': 'Original Audio',
+    'detail.subtitulos': 'Subtitles',
+    'detail.disponibleEnReproductor': 'Available in the player',
+    'detail.cambiarIdioma': 'Change Language',
+    'detail.usarConfigReproductor': 'Use the settings icon in the player to change audio and subtitles',
 
     // Player
     'player.servidor1': 'Server 1',

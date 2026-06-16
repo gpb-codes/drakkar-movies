@@ -212,17 +212,49 @@ export default function Detail() {
           <div className="dp__section">
             <h2 className="dp__section-title">{t('detail.reparto')}</h2>
             <div className="dp__cast-grid">
-              {actors.slice(0, 12).map((a, i) => (
-                <div key={i} className="dp__cast-card">
-                  <div className="dp__cast-avatar">
-                    <span>{a.name.split(' ').map(n => n[0]).join('').slice(0, 2)}</span>
+              {actors.slice(0, 12).map((a, i) => {
+                const colors = ['#a855f7','#60a5fa','#fbbf24','#4ade80','#f97316','#ec4899','#14b8a6','#ef4444','#8b5cf6','#06b6d4','#f59e0b','#10b981'];
+                const color = colors[i % colors.length];
+                return (
+                  <div key={i} className="dp__cast-card">
+                    <div className="dp__cast-avatar" style={{ borderColor: color + '40', background: `linear-gradient(135deg, ${color}20, ${color}08)` }}>
+                      <span style={{ color }}>{a.name.split(' ').map(n => n[0]).join('').slice(0, 2)}</span>
+                    </div>
+                    <div className="dp__cast-name">{a.name}</div>
                   </div>
-                  <div className="dp__cast-name">{a.name}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
+
+        {/* Language & Availability */}
+        <div className="dp__section">
+          <h2 className="dp__section-title">{t('detail.idiomasDisponibles')}</h2>
+          <div className="dp__lang-info">
+            <div className="dp__lang-card">
+              <div className="dp__lang-icon">🔊</div>
+              <div className="dp__lang-text">
+                <div className="dp__lang-label">{t('detail.audioOriginal')}</div>
+                <div className="dp__lang-value">{detail.Language !== 'N/A' ? detail.Language : 'No especificado'}</div>
+              </div>
+            </div>
+            <div className="dp__lang-card">
+              <div className="dp__lang-icon">💬</div>
+              <div className="dp__lang-text">
+                <div className="dp__lang-label">{t('detail.subtitulos')}</div>
+                <div className="dp__lang-value">{t('detail.disponibleEnReproductor')}</div>
+              </div>
+            </div>
+            <div className="dp__lang-card dp__lang-card--tip">
+              <div className="dp__lang-icon">💡</div>
+              <div className="dp__lang-text">
+                <div className="dp__lang-label">{t('detail.cambiarIdioma')}</div>
+                <div className="dp__lang-value">{t('detail.usarConfigReproductor')}</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Directors & Writers */}
         {(directors.length > 0 || writers.length > 0) && (
@@ -579,23 +611,30 @@ export default function Detail() {
           transform: translateY(-4px);
         }
         .dp__cast-avatar {
-          width: 56px;
-          height: 56px;
+          width: 60px;
+          height: 60px;
           border-radius: 50%;
-          background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(96,165,250,0.15));
-          border: 2px solid rgba(168,85,247,0.2);
+          border: 2px solid;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 0.8rem;
+          font-size: 0.85rem;
           font-weight: 800;
-          color: var(--accent-purple-light);
+          transition: all 0.3s;
+        }
+        .dp__cast-card:hover .dp__cast-avatar {
+          transform: scale(1.1);
+          box-shadow: 0 4px 20px rgba(168,85,247,0.3);
         }
         .dp__cast-name {
-          font-size: 0.75rem;
+          font-size: 0.72rem;
           font-weight: 600;
           color: rgba(255,255,255,0.8);
           line-height: 1.3;
+          max-width: 100px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         /* Crew */
@@ -669,6 +708,52 @@ export default function Detail() {
           transition: all 0.2s;
         }
         .dp__prod-tag:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+        /* Language Info */
+        .dp__lang-info {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+          gap: 12px;
+        }
+        .dp__lang-card {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding: 16px 18px;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.06);
+          border-radius: 12px;
+          transition: all 0.2s;
+        }
+        .dp__lang-card:hover { background: rgba(255,255,255,0.05); }
+        .dp__lang-card--tip {
+          background: rgba(168,85,247,0.06);
+          border-color: rgba(168,85,247,0.12);
+        }
+        .dp__lang-icon {
+          font-size: 1.4rem;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(255,255,255,0.04);
+          border-radius: 10px;
+          flex-shrink: 0;
+        }
+        .dp__lang-text { display: flex; flex-direction: column; gap: 2px; }
+        .dp__lang-label {
+          font-size: 0.6rem;
+          font-weight: 700;
+          color: rgba(255,255,255,0.4);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+        .dp__lang-value {
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: rgba(255,255,255,0.85);
+        }
 
         /* Ratings */
         .dp__ratings {
