@@ -1,7 +1,5 @@
 const STREAMING_API_KEY = import.meta.env.VITE_STREAMING_AVAILABILITY_KEY || '';
-const WATCHMODE_API_KEY = import.meta.env.VITE_WATCHMODE_KEY || '';
 const BASE_URL = 'https://api.movieofthenight.com/v4';
-const WATCHMODE_URL = 'https://api.watchmode.com/v1';
 
 export interface StreamingOption {
   service: string;
@@ -51,77 +49,40 @@ const SERVICE_COLORS: Record<string, string> = {
   vix: '#E4007C',
 };
 
-const WATCHMODE_TYPES: Record<string, StreamingOption['type']> = {
-  sub: 'subscription',
-  free: 'free',
-  ads: 'ads',
-  rent: 'rent',
-  buy: 'buy',
-};
-
 export async function getStreamingAvailability(imdbId: string): Promise<StreamingOption[]> {
-  const options: StreamingOption[] = [];
+  if (!STREAMING_API_KEY) return [];
 
-  // Try Streaming Availability API first
-  if (STREAMING_API_KEY) {
-    try {
-      const response = await fetch(
-        `${BASE_URL}/shows/${imdbId}?country=us`,
-        {
-          headers: { 'X-API-Key': STREAMING_API_KEY },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        if (data.streamingOptions) {
-          for (const [service, opts] of Object.entries(data.streamingOptions)) {
-            const serviceLower = service.toLowerCase();
-            const optArray = Array.isArray(opts) ? opts : [opts];
-            for (const opt of optArray) {
-              options.push({
-                service,
-                logo: SERVICE_LOGOS[serviceLower] || '',
-                type: opt.type || 'subscription',
-                link: opt.link || '',
-              });
-            }
-          }
-        }
-        if (options.length > 0) return options;
+  try {
+    const response = await fetch(
+      `${BASE_URL}/shows/${imdbId}?country=us`,
+      {
+        headers: { 'X-API-Key': STREAMING_API_KEY },
       }
-    } catch {}
-  }
+    );
+    if (!response.ok) return [];
 
-  // Fallback to Watchmode API
-  if (WATCHMODE_API_KEY) {
-    try {
-      const response = await fetch(
-        `${WATCHMODE_URL}/search/?apiKey=${WATCHMODE_API_KEY}&search_field=imdb_id&search_value=${imdbId}`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        if (data.title_id) {
-          const sourcesResponse = await fetch(
-            `${WATCHMODE_URL}/title/${data.title_id}/sources/?apiKey=${WATCHMODE_API_KEY}`
-          );
-          if (sourcesResponse.ok) {
-            const sourcesData = await sourcesResponse.json();
-            for (const source of sourcesData.sources || []) {
-              const name = source.name?.toLowerCase() || '';
-              options.push({
-                service: source.name || '',
-                logo: SERVICE_LOGOS[name] || '',
-                type: WATCHMODE_TYPES[source.type] || 'subscription',
-                link: source.web_url || '',
-              });
-            }
-          }
+    const data = await response.json();
+    const options: StreamingOption[] = [];
+
+    if (data.streamingOptions) {
+      for (const [service, opts] of Object.entries(data.streamingOptions)) {
+        const serviceLower = service.toLowerCase();
+        const optArray = Array.isArray(opts) ? opts : [opts];
+        for (const opt of optArray) {
+          options.push({
+            service,
+            logo: SERVICE_LOGOS[serviceLower] || '',
+            type: opt.type || 'subscription',
+            link: opt.link || '',
+          });
         }
       }
-    } catch {}
-  }
+    }
 
-  return options;
+    return options;
+  } catch {
+    return [];
+  }
 }
 
 export function getServiceColor(service: string): string {
