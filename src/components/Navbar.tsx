@@ -5,16 +5,16 @@ import { useI18n } from '../context/I18nContext';
 import { DONATION_CONFIG } from '../config';
 
 const GENRES = [
-  { id: 'Action', icon: '🔥' },
-  { id: 'Comedy', icon: '😂' },
-  { id: 'Drama', icon: '🎭' },
-  { id: 'Horror', icon: '👻' },
-  { id: 'Sci-Fi', icon: '🚀' },
-  { id: 'Thriller', icon: '🔪' },
-  { id: 'Animation', icon: '✨' },
-  { id: 'Romance', icon: '💜' },
-  { id: 'Fantasy', icon: '🧙' },
-  { id: 'Crime', icon: '🔍' },
+  { id: 'Action', color: '#ef4444' },
+  { id: 'Comedy', color: '#fbbf24' },
+  { id: 'Drama', color: '#a855f7' },
+  { id: 'Horror', color: '#22c55e' },
+  { id: 'Sci-Fi', color: '#3b82f6' },
+  { id: 'Thriller', color: '#f97316' },
+  { id: 'Animation', color: '#ec4899' },
+  { id: 'Romance', color: '#d946ef' },
+  { id: 'Fantasy', color: '#14b8a6' },
+  { id: 'Crime', color: '#6366f1' },
 ];
 
 const GENRE_KEYS: Record<string, string> = {
@@ -103,7 +103,8 @@ export default function Navbar() {
             <div className={`nb__panel ${genresOpen ? 'nb__panel--show' : ''}`}>
               {GENRES.map(g => (
                 <button key={g.id} className="nb__genre" onClick={() => handleGenre(g.id)}>
-                  <span>{g.icon}</span> {t(GENRE_KEYS[g.id])}
+                  <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill={g.color}/></svg>
+                  <span>{t(GENRE_KEYS[g.id])}</span>
                 </button>
               ))}
             </div>

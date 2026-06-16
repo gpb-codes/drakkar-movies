@@ -184,19 +184,19 @@ export default function Home() {
           <h2 className="home__label">{t('home.exploraGenero')}</h2>
           <div className="home__genre-grid">
             {[
-              { id: 'Action', i: '🔥', c: '#ef4444', k: 'genre.accion' },
-              { id: 'Comedy', i: '😂', c: '#fbbf24', k: 'genre.comedia' },
-              { id: 'Drama', i: '🎭', c: '#a855f7', k: 'genre.drama' },
-              { id: 'Horror', i: '👻', c: '#22c55e', k: 'genre.terror' },
-              { id: 'Sci-Fi', i: '🚀', c: '#3b82f6', k: 'genre.scifi' },
-              { id: 'Thriller', i: '🔪', c: '#f97316', k: 'genre.thriller' },
-              { id: 'Animation', i: '✨', c: '#ec4899', k: 'genre.animacion' },
-              { id: 'Romance', i: '💜', c: '#a855f7', k: 'genre.romance' },
-              { id: 'Fantasy', i: '🧙', c: '#14b8a6', k: 'genre.fantasia' },
-              { id: 'Crime', i: '🔍', c: '#6366f1', k: 'genre.crimen' },
+              { id: 'Action', c: '#ef4444', k: 'genre.accion' },
+              { id: 'Comedy', c: '#fbbf24', k: 'genre.comedia' },
+              { id: 'Drama', c: '#a855f7', k: 'genre.drama' },
+              { id: 'Horror', c: '#22c55e', k: 'genre.terror' },
+              { id: 'Sci-Fi', c: '#3b82f6', k: 'genre.scifi' },
+              { id: 'Thriller', c: '#f97316', k: 'genre.thriller' },
+              { id: 'Animation', c: '#ec4899', k: 'genre.animacion' },
+              { id: 'Romance', c: '#d946ef', k: 'genre.romance' },
+              { id: 'Fantasy', c: '#14b8a6', k: 'genre.fantasia' },
+              { id: 'Crime', c: '#6366f1', k: 'genre.crimen' },
             ].map(g => (
               <Link key={g.id} to={`/genre/${g.id}`} className="gtile" style={{ '--gc': g.c } as React.CSSProperties}>
-                <span className="gtile__icon">{g.i}</span>
+                <svg className="gtile__icon" width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="7" fill={g.c}/></svg>
                 <span className="gtile__name">{t(g.k)}</span>
               </Link>
             ))}

@@ -99,6 +99,11 @@ const translations: Record<Lang, Record<string, string>> = {
     'player.noReproduce': '¿No reproduce? Prueba otro servidor',
     'player.episodio': 'Ep.',
     'player.noEncontrado': 'No encontrado',
+    'player.capitulos': 'Capítulos',
+    'player.temporada': 'Temporada',
+    'player.seleccionarCapitulo': 'Seleccionar Capítulo',
+    'player.cargando': 'Cargando...',
+    'player.noEpisodios': 'No hay episodios disponibles',
 
     // Series
     'series.title': 'Series',
@@ -132,7 +137,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'card.pelicula': 'Película',
 
     // Donation
-    'donate.apoya': 'Apoya al proyecto con una donación ☕',
+    'donate.apoya': 'Apoya al proyecto con una donación',
   },
   en: {
     // Navbar
@@ -224,6 +229,11 @@ const translations: Record<Lang, Record<string, string>> = {
     'player.noReproduce': "Not playing? Try another server",
     'player.episodio': 'Ep.',
     'player.noEncontrado': 'Not found',
+    'player.capitulos': 'Episodes',
+    'player.temporada': 'Season',
+    'player.seleccionarCapitulo': 'Select Episode',
+    'player.cargando': 'Loading...',
+    'player.noEpisodios': 'No episodes available',
 
     // Series
     'series.title': 'Series',
@@ -257,7 +267,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'card.pelicula': 'Movie',
 
     // Donation
-    'donate.apoya': 'Support the project with a donation ☕',
+    'donate.apoya': 'Support the project with a donation',
   },
 };
 

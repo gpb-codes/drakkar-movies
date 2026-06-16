@@ -6,16 +6,16 @@ import { useI18n } from '../context/I18nContext';
 import type { OmdbSearchResult } from '../types/tmdb';
 
 const SERIES_GENRES = [
-  { id: 'all', name: 'series.todas', icon: '📺' },
-  { id: 'Drama', name: 'genre.drama', icon: '🎭' },
-  { id: 'Comedy', name: 'genre.comedia', icon: '😂' },
-  { id: 'Action', name: 'genre.accion', icon: '🔥' },
-  { id: 'Sci-Fi', name: 'genre.sciFi', icon: '🚀' },
-  { id: 'Horror', name: 'genre.terror', icon: '👻' },
-  { id: 'Crime', name: 'genre.crimen', icon: '🔍' },
-  { id: 'Animation', name: 'genre.animacion', icon: '✨' },
-  { id: 'Thriller', name: 'genre.thriller', icon: '🔪' },
-  { id: 'Fantasy', name: 'genre.fantasia', icon: '🧙' },
+  { id: 'all', name: 'series.todas', color: '#a855f7' },
+  { id: 'Drama', name: 'genre.drama', color: '#a855f7' },
+  { id: 'Comedy', name: 'genre.comedia', color: '#fbbf24' },
+  { id: 'Action', name: 'genre.accion', color: '#ef4444' },
+  { id: 'Sci-Fi', name: 'genre.sciFi', color: '#3b82f6' },
+  { id: 'Horror', name: 'genre.terror', color: '#22c55e' },
+  { id: 'Crime', name: 'genre.crimen', color: '#6366f1' },
+  { id: 'Animation', name: 'genre.animacion', color: '#ec4899' },
+  { id: 'Thriller', name: 'genre.thriller', color: '#f97316' },
+  { id: 'Fantasy', name: 'genre.fantasia', color: '#14b8a6' },
 ];
 
 const SERIES_QUERIES: Record<string, string[]> = {
@@ -102,7 +102,7 @@ export default function Series() {
             className={`series-filter ${activeGenre === g.id ? 'series-filter--active' : ''}`}
             onClick={() => handleGenreChange(g.id)}
           >
-            <span className="series-filter__icon">{g.icon}</span>
+            <svg className="series-filter__icon" width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="6" fill={g.color}/></svg>
             <span className="series-filter__name">{t(g.name)}</span>
           </button>
         ))}

@@ -154,6 +154,14 @@ export const tmdb = {
       return { Search: [], totalResults: '0', Response: 'False' };
     }
   },
+
+  getSeason: async (id: string, season: number): Promise<any> => {
+    try {
+      return await fetchOMDB({ i: id, Season: String(season) });
+    } catch {
+      return { Episodes: [] };
+    }
+  },
 };
 
 export const GENRE_MAP: Record<string, string> = {
