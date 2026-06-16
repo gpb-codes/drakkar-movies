@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { tmdb, getImageUrl, getActorImageUrl } from '../services/tmdb';
+import { getStreamingAvailability, getServiceColor, getServiceName, type StreamingOption } from '../services/streaming';
 import { useWatchlistContext } from '../context/WatchlistContext';
 import { useI18n } from '../context/I18nContext';
 import { addToHistory } from '../services/history';
@@ -37,6 +38,7 @@ export default function Detail() {
   const { type, id } = useParams<{ type: string; id: string }>();
   const [detail, setDetail] = useState<OmdbMovie | null>(null);
   const [loading, setLoading] = useState(true);
+  const [streamingOptions, setStreamingOptions] = useState<StreamingOption[]>([]);
   const { toggleWatchlist, isInWatchlist } = useWatchlistContext();
   const { t } = useI18n();
   const castRef = useRef<HTMLDivElement>(null);
@@ -55,6 +57,8 @@ export default function Detail() {
             title: data.Title,
             poster_path: data.Poster,
           });
+          const options = await getStreamingAvailability(data.imdbID);
+          setStreamingOptions(options);
         }
       } catch (err) { console.error(err); }
       finally { setLoading(false); }
@@ -204,6 +208,30 @@ export default function Detail() {
 
             {/* Plot */}
             <p className="dp__plot">{detail.Plot}</p>
+
+            {/* Streaming Availability */}
+            {streamingOptions.length > 0 && (
+              <div className="dp__streaming">
+                <h3 className="dp__streaming-title">{t('detail.disponibleEn')}</h3>
+                <div className="dp__streaming-grid">
+                  {streamingOptions.map((opt, i) => (
+                    <a
+                      key={i}
+                      href={opt.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="dp__streaming-chip"
+                      style={{ '--chip-color': getServiceColor(opt.service) } as React.CSSProperties}
+                    >
+                      <span className="dp__streaming-dot" />
+                      <span className="dp__streaming-name">{getServiceName(opt.service)}</span>
+                      {opt.type === 'free' && <span className="dp__streaming-badge">Gratis</span>}
+                      {opt.type === 'ads' && <span className="dp__streaming-badge">Con anuncios</span>}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="dp__actions">
@@ -850,6 +878,58 @@ export default function Detail() {
           margin: 0 0 28px;
           font-size: 0.92rem;
           max-width: 600px;
+        }
+
+        /* --- Streaming Availability --- */
+        .dp__streaming {
+          margin-bottom: 28px;
+        }
+        .dp__streaming-title {
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: var(--dp-text-muted);
+          margin: 0 0 12px;
+          font-weight: 600;
+        }
+        .dp__streaming-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .dp__streaming-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 14px;
+          background: rgba(var(--chip-color), 0.1);
+          border: 1px solid rgba(var(--chip-color), 0.25);
+          border-radius: 20px;
+          color: var(--dp-text);
+          text-decoration: none;
+          font-size: 0.82rem;
+          font-weight: 500;
+          transition: all 0.25s;
+          cursor: pointer;
+        }
+        .dp__streaming-chip:hover {
+          background: rgba(var(--chip-color), 0.2);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(var(--chip-color), 0.2);
+        }
+        .dp__streaming-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--chip-color);
+        }
+        .dp__streaming-badge {
+          font-size: 0.7rem;
+          padding: 2px 6px;
+          background: rgba(34, 197, 94, 0.2);
+          color: #22c55e;
+          border-radius: 10px;
+          font-weight: 600;
         }
 
         /* --- Action Buttons --- */

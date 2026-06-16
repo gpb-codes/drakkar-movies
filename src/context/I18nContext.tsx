@@ -87,6 +87,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'detail.disponibleEnReproductor': 'Disponible en el reproductor',
     'detail.cambiarIdioma': 'Cambiar Idioma',
     'detail.usarConfigReproductor': 'Usa el ícono de configuración del reproductor para cambiar audio y subtítulos',
+    'detail.disponibleEn': 'Disponible en',
 
     // Player
     'player.servidor1': 'Servidor 1',
@@ -217,6 +218,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'detail.disponibleEnReproductor': 'Available in the player',
     'detail.cambiarIdioma': 'Change Language',
     'detail.usarConfigReproductor': 'Use the settings icon in the player to change audio and subtitles',
+    'detail.disponibleEn': 'Available on',
 
     // Player
     'player.servidor1': 'Server 1',
