@@ -32,6 +32,7 @@ const GENRE_KEYS: Record<string, string> = {
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [genresOpen, setGenresOpen] = useState(false);
   const { watchlist } = useWatchlistContext();
@@ -40,7 +41,13 @@ export default function Navbar() {
   const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 40);
+      setHidden(y > 120 && y > lastY);
+      lastY = y;
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -54,7 +61,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`nb ${scrolled ? 'nb--solid' : ''}`}>
+      <nav className={`nb ${scrolled ? 'nb--solid' : ''} ${hidden ? 'nb--hidden' : ''}`}>
         <Link to="/" className="nb__brand">
           <div className="nb__logo">
             <svg width="30" height="30" viewBox="0 0 36 36" fill="none">
@@ -187,12 +194,15 @@ export default function Navbar() {
           padding: 0 clamp(16px, 3vw, 40px);
           height: var(--h);
           background: transparent;
-          transition: background 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s cubic-bezier(0.4,0,0.2,1), backdrop-filter 0.4s cubic-bezier(0.4,0,0.2,1);
+          transition: background 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s cubic-bezier(0.4,0,0.2,1), backdrop-filter 0.4s cubic-bezier(0.4,0,0.2,1), transform 0.35s cubic-bezier(0.4,0,0.2,1);
         }
         .nb--solid {
           background: rgba(6, 2, 15, 0.82);
           backdrop-filter: blur(24px) saturate(1.6);
           box-shadow: 0 1px 0 rgba(168,85,247,0.06), 0 4px 24px rgba(0,0,0,0.25);
+        }
+        .nb--hidden {
+          transform: translateY(-100%);
         }
 
         /* Brand */

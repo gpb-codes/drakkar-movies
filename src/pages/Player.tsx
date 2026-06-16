@@ -49,35 +49,35 @@ export default function Player() {
   const SERVERS = [
     {
       id: '1',
-      name: 'EzVideo',
+      name: 'APIPlayer',
       url: (mid: string, tp: string, s?: string, e?: string) =>
         tp === 'tv' && s && e
-          ? `https://ezvidapi.com/embed/tv/${mid}/${s}/${e}`
-          : `https://ezvidapi.com/embed/movie/${mid}`,
+          ? `https://apiplayer.ru/embed/tv/${mid}/${s}/${e}`
+          : `https://apiplayer.ru/embed/movie/${mid}`,
     },
     {
       id: '2',
+      name: 'VidSrc',
+      url: (mid: string, tp: string, s?: string, e?: string) =>
+        tp === 'tv' && s && e
+          ? `https://vidsrc.fyi/embed/tv/${mid}/${s}/${e}`
+          : `https://vidsrc.fyi/embed/movie/${mid}`,
+    },
+    {
+      id: '3',
+      name: '2Embed',
+      url: (mid: string, tp: string, s?: string, e?: string) =>
+        tp === 'tv' && s && e
+          ? `https://www.2embed.stream/embed/tv/${mid}/${s}/${e}`
+          : `https://www.2embed.stream/embed/movie/${mid}`,
+    },
+    {
+      id: '4',
       name: 'SuperEmbed',
       url: (mid: string, tp: string, s?: string, e?: string) =>
         tp === 'tv' && s && e
           ? `https://multiembed.mov/?video_id=${mid}&tmdb=1&s=${s}&e=${e}`
           : `https://multiembed.mov/?video_id=${mid}&tmdb=1`,
-    },
-    {
-      id: '3',
-      name: 'StreamSrc',
-      url: (mid: string, tp: string, s?: string, e?: string) =>
-        tp === 'tv' && s && e
-          ? `https://streamsrc.cc/watch/series/tmdbid=${mid}`
-          : `https://streamsrc.cc/watch/movie/tmdbid=${mid}`,
-    },
-    {
-      id: '4',
-      name: 'EmbedSU',
-      url: (mid: string, tp: string, s?: string, e?: string) =>
-        tp === 'tv' && s && e
-          ? `https://embed.su/embed/tv/${mid}/${s}/${e}`
-          : `https://embed.su/embed/movie/${mid}`,
     },
   ];
 
