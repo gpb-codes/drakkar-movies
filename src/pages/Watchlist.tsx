@@ -1,19 +1,21 @@
 import { useWatchlistContext } from '../context/WatchlistContext';
+import { useI18n } from '../context/I18nContext';
 import MovieCard from '../components/MovieCard';
 import { Link } from 'react-router-dom';
 
 export default function Watchlist() {
   const { watchlist, removeFromWatchlist } = useWatchlistContext();
+  const { t } = useI18n();
 
   return (
     <div className="wl">
       <div className="wl__header">
         <h1 className="wl__title">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-          Mi Lista
+          {t('watchlist.title')}
         </h1>
         {watchlist.length > 0 && (
-          <span className="wl__count">{watchlist.length} {watchlist.length === 1 ? 'elemento' : 'elementos'}</span>
+          <span className="wl__count">{watchlist.length} {watchlist.length === 1 ? t('watchlist.elemento') : t('watchlist.elementos')}</span>
         )}
       </div>
 
@@ -22,11 +24,11 @@ export default function Watchlist() {
           <div className="wl__empty-icon">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
           </div>
-          <p className="wl__empty-title">Tu lista está vacía</p>
-          <p className="wl__empty-sub">Guarda películas y series para verlas después</p>
+          <p className="wl__empty-title">{t('watchlist.vacia')}</p>
+          <p className="wl__empty-sub">{t('watchlist.vaciaSub')}</p>
           <Link to="/" className="wl__empty-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-            Explorar Inicio
+            {t('watchlist.explorar')}
           </Link>
         </div>
       ) : (
@@ -43,7 +45,7 @@ export default function Watchlist() {
               <button
                 className="wl__remove"
                 onClick={() => removeFromWatchlist(item.id, item.media_type)}
-                title="Remover"
+                title={t('watchlist.remover')}
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
               </button>

@@ -3,15 +3,17 @@ import { useParams } from 'react-router-dom';
 import { tmdb, GENRE_MAP } from '../services/tmdb';
 import MovieCard from '../components/MovieCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useI18n } from '../context/I18nContext';
 import type { OmdbSearchResult } from '../types/tmdb';
 
 export default function Genre() {
+  const { t } = useI18n();
   const { id } = useParams<{ id: string }>();
   const [movies, setMovies] = useState<OmdbSearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
-  const genreName = GENRE_MAP[id || ''] || id || 'Categoría';
+  const genreName = GENRE_MAP[id || ''] || id || t('genrePage.categoria');
 
   useEffect(() => {
     async function load() {
@@ -36,9 +38,9 @@ export default function Genre() {
             {movies.map(m => <MovieCard key={m.imdbID} movie={m} />)}
           </div>
           <div className="pagination">
-            <button className="pg-btn" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>← Anterior</button>
+            <button className="pg-btn" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>{t('genrePage.anterior')}</button>
             <span className="pg-info">{page}</span>
-            <button className="pg-btn" onClick={() => setPage(p => p + 1)}>Siguiente →</button>
+            <button className="pg-btn" onClick={() => setPage(p => p + 1)}>{t('genrePage.siguiente')}</button>
           </div>
         </>
       )}

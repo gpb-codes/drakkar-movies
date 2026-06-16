@@ -1,26 +1,41 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useWatchlistContext } from '../context/WatchlistContext';
+import { useI18n } from '../context/I18nContext';
 import { DONATION_CONFIG } from '../config';
 
 const GENRES = [
-  { id: 'Action', name: 'Acción', icon: '🔥' },
-  { id: 'Comedy', name: 'Comedia', icon: '😂' },
-  { id: 'Drama', name: 'Drama', icon: '🎭' },
-  { id: 'Horror', name: 'Terror', icon: '👻' },
-  { id: 'Sci-Fi', name: 'Sci-Fi', icon: '🚀' },
-  { id: 'Thriller', name: 'Thriller', icon: '🔪' },
-  { id: 'Animation', name: 'Animación', icon: '✨' },
-  { id: 'Romance', name: 'Romance', icon: '💜' },
-  { id: 'Fantasy', name: 'Fantasía', icon: '🧙' },
-  { id: 'Crime', name: 'Crimen', icon: '🔍' },
+  { id: 'Action', icon: '🔥' },
+  { id: 'Comedy', icon: '😂' },
+  { id: 'Drama', icon: '🎭' },
+  { id: 'Horror', icon: '👻' },
+  { id: 'Sci-Fi', icon: '🚀' },
+  { id: 'Thriller', icon: '🔪' },
+  { id: 'Animation', icon: '✨' },
+  { id: 'Romance', icon: '💜' },
+  { id: 'Fantasy', icon: '🧙' },
+  { id: 'Crime', icon: '🔍' },
 ];
+
+const GENRE_KEYS: Record<string, string> = {
+  Action: 'genre.accion',
+  Comedy: 'genre.comedia',
+  Drama: 'genre.drama',
+  Horror: 'genre.terror',
+  'Sci-Fi': 'genre.scifi',
+  Thriller: 'genre.thriller',
+  Animation: 'genre.animacion',
+  Romance: 'genre.romance',
+  Fantasy: 'genre.fantasia',
+  Crime: 'genre.crimen',
+};
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [genresOpen, setGenresOpen] = useState(false);
   const { watchlist } = useWatchlistContext();
+  const { lang, setLang, t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -63,32 +78,32 @@ export default function Navbar() {
         <div className={`nb__nav ${mobileOpen ? 'nb__nav--open' : ''}`}>
           <Link to="/" className={`nb__item ${location.pathname === '/' ? 'nb__item--on' : ''}`}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-            Inicio
+            {t('nav.inicio')}
           </Link>
           <Link to="/series" className={`nb__item ${location.pathname === '/series' ? 'nb__item--on' : ''}`}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-            Series
+            {t('nav.series')}
           </Link>
           <Link to="/upcoming" className={`nb__item ${location.pathname === '/upcoming' ? 'nb__item--on' : ''}`}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Estrenos
+            {t('nav.estrenos')}
           </Link>
           <Link to="/watchlist" className={`nb__item ${location.pathname === '/watchlist' ? 'nb__item--on' : ''}`}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
-            Mi Lista
+            {t('nav.miLista')}
             {watchlist.length > 0 && <span className="nb__dot">{watchlist.length}</span>}
           </Link>
 
           <div className="nb__drop" onMouseEnter={() => setGenresOpen(true)} onMouseLeave={() => setGenresOpen(false)}>
             <button className={`nb__item nb__item--btn ${genresOpen ? 'nb__item--on' : ''}`}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-              Categorías
+              {t('nav.categorias')}
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div className={`nb__panel ${genresOpen ? 'nb__panel--show' : ''}`}>
               {GENRES.map(g => (
                 <button key={g.id} className="nb__genre" onClick={() => handleGenre(g.id)}>
-                  <span>{g.icon}</span> {g.name}
+                  <span>{g.icon}</span> {t(GENRE_KEYS[g.id])}
                 </button>
               ))}
             </div>
@@ -96,14 +111,17 @@ export default function Navbar() {
         </div>
 
         <div className="nb__actions">
-          <a href={DONATION_CONFIG.paypalUrl} target="_blank" rel="noopener noreferrer" className="nb__donate" title={DONATION_CONFIG.message}>
+          <button className="nb__lang" onClick={() => setLang(lang === 'es' ? 'en' : 'es')} title={lang === 'es' ? 'English' : 'Español'}>
+            {lang === 'es' ? 'EN' : 'ES'}
+          </button>
+          <a href={DONATION_CONFIG.paypalUrl} target="_blank" rel="noopener noreferrer" className="nb__donate" title={t('donate.apoya')}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            Donar
+            {t('nav.donar')}
           </a>
-          <Link to="/search" className="nb__search" aria-label="Buscar">
+          <Link to="/search" className="nb__search" aria-label={t('nav.buscar')}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           </Link>
-          <button className="nb__burger" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
+          <button className="nb__burger" onClick={() => setMobileOpen(!mobileOpen)} aria-label={t('nav.menu')}>
             <span className={`nb__bar ${mobileOpen ? 'nb__bar--x' : ''}`} /><span className={`nb__bar ${mobileOpen ? 'nb__bar--x' : ''}`} /><span className={`nb__bar ${mobileOpen ? 'nb__bar--x' : ''}`} />
           </button>
         </div>
@@ -152,136 +170,156 @@ export default function Navbar() {
         }
 
         /* Nav links */
-        .nb__nav { display: flex; align-items: center; gap: 2px; }
+        .nb__nav {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+        }
         .nb__item {
           display: flex;
           align-items: center;
-          gap: 5px;
+          gap: 6px;
           padding: 6px 12px;
+          font-size: 0.73rem;
+          font-weight: 600;
           color: var(--text-secondary);
-          font-size: 0.75rem;
-          font-weight: 500;
-          letter-spacing: 0.3px;
+          text-decoration: none;
           border-radius: var(--radius-sm);
-          transition: all var(--transition-fast);
           border: none;
           background: none;
           cursor: pointer;
+          transition: color 0.2s, background 0.2s;
           white-space: nowrap;
-          text-decoration: none;
         }
-        .nb__item:hover { color: var(--text-primary); background: rgba(255,255,255,0.04); }
-        .nb__item--on { color: var(--accent-gold); background: rgba(251,191,36,0.06); }
-        .nb__item--btn { gap: 4px; }
-
+        .nb__item:hover { color: #fff; background: rgba(255,255,255,0.04); }
+        .nb__item--on { color: var(--accent-purple-light); }
+        .nb__item--btn { font-family: inherit; }
         .nb__dot {
-          background: var(--accent-purple);
-          color: #fff;
-          font-size: 0.5rem;
+          font-size: 0.55rem;
           font-weight: 700;
+          background: var(--accent-gold);
+          color: #000;
           padding: 1px 5px;
-          border-radius: 6px;
-          line-height: 1.2;
+          border-radius: 8px;
+          line-height: 1;
         }
 
         /* Dropdown */
         .nb__drop { position: relative; }
         .nb__panel {
           position: absolute;
-          top: calc(100% + 6px);
+          top: 100%;
           left: 50%;
-          transform: translateX(-50%) translateY(-4px);
-          background: rgba(12, 6, 24, 0.96);
-          backdrop-filter: blur(32px) saturate(1.4);
-          border: 1px solid rgba(168,85,247,0.1);
+          transform: translateX(-50%) translateY(4px);
+          min-width: 380px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 3px;
+          padding: 8px;
+          background: rgba(14,8,28,0.97);
+          backdrop-filter: blur(24px);
+          border: 1px solid var(--border-subtle);
           border-radius: var(--radius-lg);
-          padding: 6px;
-          min-width: 190px;
+          box-shadow: 0 24px 64px rgba(0,0,0,0.5);
           opacity: 0;
           visibility: hidden;
-          transition: all 0.22s;
-          box-shadow: 0 24px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+          pointer-events: none;
+          transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+          z-index: 1010;
         }
-        .nb__panel--show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .nb__panel--show { opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0); }
         .nb__genre {
           display: flex;
           align-items: center;
           gap: 8px;
-          width: 100%;
-          padding: 8px 12px;
+          padding: 10px 12px;
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: var(--text-secondary);
           background: none;
           border: none;
           border-radius: var(--radius-sm);
-          color: var(--text-secondary);
-          font-size: 0.78rem;
-          font-weight: 500;
           cursor: pointer;
           transition: all 0.15s;
           text-align: left;
+          font-family: inherit;
         }
-        .nb__genre:hover { background: rgba(168,85,247,0.1); color: var(--accent-gold); }
+        .nb__genre:hover { background: rgba(255,255,255,0.06); color: #fff; }
 
         /* Actions */
-        .nb__actions { display: flex; align-items: center; gap: 6px; z-index: 1002; }
-        .nb__search {
-          width: 34px; height: 34px;
-          display: flex; align-items: center; justify-content: center;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid var(--border-subtle);
-          border-radius: var(--radius-sm);
-          color: var(--text-secondary);
-          transition: all var(--transition-fast);
-          text-decoration: none;
+        .nb__actions {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          z-index: 1002;
         }
-        .nb__search:hover { background: rgba(168,85,247,0.12); color: var(--accent-gold); border-color: rgba(168,85,247,0.2); }
-
+        .nb__lang {
+          width: 28px;
+          height: 28px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.6rem;
+          font-weight: 800;
+          color: var(--accent-gold);
+          background: rgba(251,191,36,0.08);
+          border: 1px solid rgba(251,191,36,0.15);
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s;
+          letter-spacing: 0.5px;
+        }
+        .nb__lang:hover { background: rgba(251,191,36,0.15); transform: scale(1.05); }
         .nb__donate {
           display: flex;
           align-items: center;
           gap: 5px;
-          padding: 6px 12px;
-          background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(251,191,36,0.08));
-          border: 1px solid rgba(239,68,68,0.2);
-          border-radius: var(--radius-sm);
-          color: #f87171;
-          font-size: 0.7rem;
-          font-weight: 600;
+          padding: 5px 12px;
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: var(--accent-gold);
+          background: rgba(251,191,36,0.06);
+          border: 1px solid rgba(251,191,36,0.12);
+          border-radius: 8px;
           text-decoration: none;
-          transition: all var(--transition-fast);
-          white-space: nowrap;
+          transition: all 0.2s;
         }
-        .nb__donate:hover {
-          background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(251,191,36,0.12));
-          color: #fbbf24;
-          border-color: rgba(251,191,36,0.3);
-          transform: translateY(-1px);
-        }
-
-        .nb__burger {
-          display: none;
-          width: 34px; height: 34px;
-          flex-direction: column;
+        .nb__donate:hover { background: rgba(251,191,36,0.12); transform: translateY(-1px); }
+        .nb__search {
+          width: 32px;
+          height: 32px;
+          display: flex;
           align-items: center;
           justify-content: center;
+          color: var(--text-secondary);
+          border-radius: 8px;
+          transition: all 0.2s;
+        }
+        .nb__search:hover { color: #fff; background: rgba(255,255,255,0.06); }
+        .nb__burger {
+          display: none;
+          flex-direction: column;
           gap: 4px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid var(--border-subtle);
-          border-radius: var(--radius-sm);
+          padding: 8px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          z-index: 1002;
         }
         .nb__bar {
           display: block;
-          width: 14px; height: 1.5px;
+          width: 18px;
+          height: 1.5px;
           background: var(--text-secondary);
-          border-radius: 1px;
-          transition: all 0.25s;
+          border-radius: 2px;
+          transition: all 0.3s;
         }
         .nb__bar--x:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .nb__bar--x:nth-child(2) { opacity: 0; }
         .nb__bar--x:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
-
         .nb__overlay {
-          display: none;
-          position: fixed; inset: 0;
+          position: fixed;
+          inset: 0;
           background: rgba(6,2,15,0.6);
           backdrop-filter: blur(6px);
           z-index: 999;

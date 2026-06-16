@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { tmdb } from '../services/tmdb';
 import MovieCard from '../components/MovieCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useI18n } from '../context/I18nContext';
 import type { OmdbSearchResult } from '../types/tmdb';
 
 export default function Upcoming() {
+  const { t } = useI18n();
   const [movies, setMovies] = useState<OmdbSearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -24,16 +26,16 @@ export default function Upcoming() {
 
   return (
     <div className="page">
-      <h1 className="page__title">Próximos Estrenos</h1>
+      <h1 className="page__title">{t('upcoming.title')}</h1>
       {loading ? <LoadingSpinner /> : (
         <>
           <div className="grid">
             {movies.map(m => <MovieCard key={m.imdbID} movie={m} />)}
           </div>
           <div className="pagination">
-            <button className="pg-btn" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>← Anterior</button>
+            <button className="pg-btn" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>{t('genrePage.anterior')}</button>
             <span className="pg-info">{page}</span>
-            <button className="pg-btn" onClick={() => setPage(p => p + 1)}>Siguiente →</button>
+            <button className="pg-btn" onClick={() => setPage(p => p + 1)}>{t('genrePage.siguiente')}</button>
           </div>
         </>
       )}

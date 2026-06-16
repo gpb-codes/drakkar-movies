@@ -3,9 +3,11 @@ import { tmdb } from '../services/tmdb';
 import MovieCard from '../components/MovieCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useDebounce } from '../hooks/useDebounce';
+import { useI18n } from '../context/I18nContext';
 import type { OmdbSearchResult } from '../types/tmdb';
 
 export default function Search() {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<OmdbSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -49,8 +51,8 @@ export default function Search() {
     <div className="search">
       <div className="search__hero">
         <div className="search__glow" />
-        <h1 className="search__title">Buscar</h1>
-        <p className="search__subtitle">Encuentra cualquier película o serie</p>
+        <h1 className="search__title">{t('search.title')}</h1>
+        <p className="search__subtitle">{t('search.subtitle')}</p>
 
         <div className="search__bar">
           <div className="search__input-wrap">
@@ -61,7 +63,7 @@ export default function Search() {
               ref={inputRef}
               type="text"
               className="search__input"
-              placeholder="Escribe el nombre de una película o serie..."
+              placeholder={t('search.placeholder')}
               value={query}
               onChange={e => setQuery(e.target.value)}
             />
@@ -74,9 +76,9 @@ export default function Search() {
 
           <div className="search__filters">
             {[
-              { key: 'all', label: 'Todo' },
-              { key: 'movie', label: 'Películas' },
-              { key: 'series', label: 'Series' },
+              { key: 'all', label: t('search.todo') },
+              { key: 'movie', label: t('search.peliculas') },
+              { key: 'series', label: t('search.series') },
             ].map(f => (
               <button
                 key={f.key}
@@ -91,7 +93,7 @@ export default function Search() {
 
         {!searched && (
           <div className="search__quick">
-            <span className="search__quick-label">Búsquedas populares:</span>
+            <span className="search__quick-label">{t('search.populares')}</span>
             <div className="search__quick-tags">
               {quickSearches.map(s => (
                 <button key={s} className="search__tag" onClick={() => setQuery(s)}>{s}</button>
@@ -107,7 +109,7 @@ export default function Search() {
         ) : results.length > 0 ? (
           <>
             <div className="search__results-header">
-              <span className="search__results-count">{total.toLocaleString()} resultados</span>
+              <span className="search__results-count">{total.toLocaleString()} {t('search.resultados')}</span>
             </div>
             <div className="search__grid">
               {results.map((m: OmdbSearchResult) => (
@@ -122,8 +124,8 @@ export default function Search() {
                 <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M8 11h6"/>
               </svg>
             </div>
-            <p className="search__empty-text">No se encontraron resultados</p>
-            <p className="search__empty-hint">Intenta con otros términos o cambia el filtro</p>
+            <p className="search__empty-text">{t('search.noResults')}</p>
+            <p className="search__empty-hint">{t('search.noResultsHint')}</p>
           </div>
         ) : (
           <div className="search__suggestions">
@@ -132,7 +134,7 @@ export default function Search() {
                 <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
               </svg>
             </div>
-            <p className="search__suggest-text">Escribe para comenzar a buscar</p>
+            <p className="search__suggest-text">{t('search.startTyping')}</p>
           </div>
         )}
       </div>

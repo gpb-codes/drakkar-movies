@@ -3,7 +3,23 @@ import { Link } from 'react-router-dom';
 import { tmdb, getImageUrl } from '../services/tmdb';
 import ScrollRow from '../components/ScrollRow';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useI18n } from '../context/I18nContext';
 import type { OmdbSearchResult, OmdbMovie } from '../types/tmdb';
+
+interface HistoryEntry {
+  id: string;
+  media_type: string;
+  title: string;
+  poster_path: string;
+  viewed_at: number;
+}
+
+function getHistory(): HistoryEntry[] {
+  try {
+    const raw = localStorage.getItem('drakkar-history');
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
 
 const HERO_TITLES = [
   { q: 'batman', label: 'Batman' },
@@ -15,18 +31,21 @@ const HERO_TITLES = [
 ];
 
 export default function Home() {
+  const { t } = useI18n();
   const [featured, setFeatured] = useState<OmdbMovie | null>(null);
   const [popular, setPopular] = useState<OmdbSearchResult[]>([]);
   const [topRated, setTopRated] = useState<OmdbSearchResult[]>([]);
   const [series, setSeries] = useState<OmdbSearchResult[]>([]);
   const [action, setAction] = useState<OmdbSearchResult[]>([]);
   const [scifi, setScifi] = useState<OmdbSearchResult[]>([]);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [slide, setSlide] = useState(0);
   const [heroes, setHeroes] = useState<OmdbMovie[]>([]);
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => {
+    setHistory(getHistory());
     async function load() {
       try {
         const [p, t, s, a, sc] = await Promise.all([
@@ -84,7 +103,7 @@ export default function Home() {
 
           <div className="hero__main" key={`m-${featured.imdbID}`}>
             <div className="hero__accent" />
-            <div className="hero__tag">&#9670; Destacado</div>
+            <div className="hero__tag">&#9670; {t('home.destacado')}</div>
             <h1 className="hero__title">{featured.Title}</h1>
             <div className="hero__row">
               {featured.imdbRating !== 'N/A' && (
@@ -108,11 +127,11 @@ export default function Home() {
             <div className="hero__btns">
               <Link to={`/detail/${featured.Type === 'series' ? 'tv' : 'movie'}/${featured.imdbID}`} className="btn btn--primary">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Ver Ahora
+                {t('home.verAhora')}
               </Link>
               <Link to={`/detail/${featured.Type === 'series' ? 'tv' : 'movie'}/${featured.imdbID}`} className="btn btn--glass">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-                Más Info
+                {t('home.masInfo')}
               </Link>
             </div>
           </div>
@@ -134,30 +153,51 @@ export default function Home() {
       )}
 
       <div className="home__body">
-        <ScrollRow title="Películas Populares" movies={popular} />
-        <ScrollRow title="Top Rated" movies={topRated} />
-        <ScrollRow title="Series" movies={series} />
-        <ScrollRow title="Acción" movies={action} />
-        <ScrollRow title="Ciencia Ficción" movies={scifi} />
+        {history.length > 0 && (
+          <div className="home__continue">
+            <h2 className="home__label">{t('detail.seguirViendo')}</h2>
+            <div className="home__continue-grid">
+              {history.slice(0, 6).map(h => (
+                <Link key={h.id} to={`/detail/${h.media_type}/${h.id}`} className="home__continue-card">
+                  <img src={getImageUrl(h.poster_path)} alt={h.title} />
+                  <div className="home__continue-overlay">
+                    <div className="home__continue-play">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    </div>
+                  </div>
+                  <div className="home__continue-info">
+                    <span className="home__continue-title">{h.title}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <ScrollRow title={t('home.populares')} movies={popular} />
+        <ScrollRow title={t('home.topRated')} movies={topRated} />
+        <ScrollRow title={t('home.series')} movies={series} />
+        <ScrollRow title={t('home.accion')} movies={action} />
+        <ScrollRow title={t('home.scifi')} movies={scifi} />
 
         <div className="home__genres">
-          <h2 className="home__label">Explora por Género</h2>
+          <h2 className="home__label">{t('home.exploraGenero')}</h2>
           <div className="home__genre-grid">
             {[
-              { id: 'Action', n: 'Acción', i: '🔥', c: '#ef4444' },
-              { id: 'Comedy', n: 'Comedia', i: '😂', c: '#fbbf24' },
-              { id: 'Drama', n: 'Drama', i: '🎭', c: '#a855f7' },
-              { id: 'Horror', n: 'Terror', i: '👻', c: '#22c55e' },
-              { id: 'Sci-Fi', n: 'Sci-Fi', i: '🚀', c: '#3b82f6' },
-              { id: 'Thriller', n: 'Thriller', i: '🔪', c: '#f97316' },
-              { id: 'Animation', n: 'Animación', i: '✨', c: '#ec4899' },
-              { id: 'Romance', n: 'Romance', i: '💜', c: '#a855f7' },
-              { id: 'Fantasy', n: 'Fantasía', i: '🧙', c: '#14b8a6' },
-              { id: 'Crime', n: 'Crimen', i: '🔍', c: '#6366f1' },
+              { id: 'Action', i: '🔥', c: '#ef4444', k: 'genre.accion' },
+              { id: 'Comedy', i: '😂', c: '#fbbf24', k: 'genre.comedia' },
+              { id: 'Drama', i: '🎭', c: '#a855f7', k: 'genre.drama' },
+              { id: 'Horror', i: '👻', c: '#22c55e', k: 'genre.terror' },
+              { id: 'Sci-Fi', i: '🚀', c: '#3b82f6', k: 'genre.scifi' },
+              { id: 'Thriller', i: '🔪', c: '#f97316', k: 'genre.thriller' },
+              { id: 'Animation', i: '✨', c: '#ec4899', k: 'genre.animacion' },
+              { id: 'Romance', i: '💜', c: '#a855f7', k: 'genre.romance' },
+              { id: 'Fantasy', i: '🧙', c: '#14b8a6', k: 'genre.fantasia' },
+              { id: 'Crime', i: '🔍', c: '#6366f1', k: 'genre.crimen' },
             ].map(g => (
               <Link key={g.id} to={`/genre/${g.id}`} className="gtile" style={{ '--gc': g.c } as React.CSSProperties}>
                 <span className="gtile__icon">{g.i}</span>
-                <span className="gtile__name">{g.n}</span>
+                <span className="gtile__name">{t(g.k)}</span>
               </Link>
             ))}
           </div>
@@ -365,6 +405,67 @@ export default function Home() {
 
         /* ─── Body ─── */
         .home__body { padding: 16px 0 60px; }
+
+        /* Continue Watching */
+        .home__continue { padding: 0 clamp(16px, 4vw, 48px) 24px; }
+        .home__continue-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+          gap: 12px;
+        }
+        .home__continue-card {
+          position: relative;
+          border-radius: 12px;
+          overflow: hidden;
+          aspect-ratio: 2/3;
+          text-decoration: none;
+          transition: all 0.3s;
+        }
+        .home__continue-card:hover { transform: translateY(-4px) scale(1.02); }
+        .home__continue-card img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .home__continue-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, transparent 40%, rgba(6,2,15,0.9) 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+        .home__continue-card:hover .home__continue-overlay { opacity: 1; }
+        .home__continue-play {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: rgba(168,85,247,0.9);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          box-shadow: 0 4px 20px rgba(168,85,247,0.4);
+        }
+        .home__continue-info {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          padding: 10px;
+        }
+        .home__continue-title {
+          font-size: 0.7rem;
+          font-weight: 600;
+          color: #fff;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
         .home__genres { padding: 16px clamp(16px, 4vw, 48px) 0; }
         .home__label {
           font-size: 0.8rem;
@@ -408,6 +509,7 @@ export default function Home() {
           .hero__btns { flex-direction: column; }
           .btn { justify-content: center; width: 100%; }
           .home__genre-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+          .home__continue-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
         }
       `}</style>
     </div>

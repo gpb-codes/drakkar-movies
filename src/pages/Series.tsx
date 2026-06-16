@@ -2,19 +2,20 @@ import { useState, useEffect } from 'react';
 import { tmdb } from '../services/tmdb';
 import MovieCard from '../components/MovieCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useI18n } from '../context/I18nContext';
 import type { OmdbSearchResult } from '../types/tmdb';
 
 const SERIES_GENRES = [
-  { id: 'all', name: 'Todas', icon: '📺' },
-  { id: 'Drama', name: 'Drama', icon: '🎭' },
-  { id: 'Comedy', name: 'Comedia', icon: '😂' },
-  { id: 'Action', name: 'Acción', icon: '🔥' },
-  { id: 'Sci-Fi', name: 'Sci-Fi', icon: '🚀' },
-  { id: 'Horror', name: 'Terror', icon: '👻' },
-  { id: 'Crime', name: 'Crimen', icon: '🔍' },
-  { id: 'Animation', name: 'Animación', icon: '✨' },
-  { id: 'Thriller', name: 'Thriller', icon: '🔪' },
-  { id: 'Fantasy', name: 'Fantasía', icon: '🧙' },
+  { id: 'all', name: 'series.todas', icon: '📺' },
+  { id: 'Drama', name: 'genre.drama', icon: '🎭' },
+  { id: 'Comedy', name: 'genre.comedia', icon: '😂' },
+  { id: 'Action', name: 'genre.accion', icon: '🔥' },
+  { id: 'Sci-Fi', name: 'genre.sciFi', icon: '🚀' },
+  { id: 'Horror', name: 'genre.terror', icon: '👻' },
+  { id: 'Crime', name: 'genre.crimen', icon: '🔍' },
+  { id: 'Animation', name: 'genre.animacion', icon: '✨' },
+  { id: 'Thriller', name: 'genre.thriller', icon: '🔪' },
+  { id: 'Fantasy', name: 'genre.fantasia', icon: '🧙' },
 ];
 
 const SERIES_QUERIES: Record<string, string[]> = {
@@ -42,6 +43,7 @@ const SERIES_QUERIES: Record<string, string[]> = {
 };
 
 export default function Series() {
+  const { t } = useI18n();
   const [series, setSeries] = useState<OmdbSearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeGenre, setActiveGenre] = useState('all');
@@ -88,9 +90,9 @@ export default function Series() {
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2">
             <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/>
           </svg>
-          Series
+          {t('series.title')}
         </h1>
-        <p className="series-hero__sub">Descubre las mejores series para bingewatching</p>
+        <p className="series-hero__sub">{t('series.subtitle')}</p>
       </div>
 
       <div className="series-filters">
@@ -101,7 +103,7 @@ export default function Series() {
             onClick={() => handleGenreChange(g.id)}
           >
             <span className="series-filter__icon">{g.icon}</span>
-            <span className="series-filter__name">{g.name}</span>
+            <span className="series-filter__name">{t(g.name)}</span>
           </button>
         ))}
       </div>
@@ -112,7 +114,7 @@ export default function Series() {
         ) : series.length > 0 ? (
           <>
             <div className="series-header">
-              <span className="series-count">{series.length} series</span>
+              <span className="series-count">{series.length} {t('series.series')}</span>
             </div>
             <div className="series-grid">
               {series.map((s: OmdbSearchResult) => (
@@ -122,18 +124,18 @@ export default function Series() {
             <div className="series-pagination">
               <button className="pg-btn" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
-                Anterior
+                {t('series.anterior')}
               </button>
-              <span className="pg-info">Página {page}</span>
+              <span className="pg-info">{t('series.pagina')} {page}</span>
               <button className="pg-btn" onClick={() => setPage(p => p + 1)}>
-                Siguiente
+                {t('series.siguiente')}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
               </button>
             </div>
           </>
         ) : (
           <div className="series-empty">
-            <p>No se encontraron series</p>
+            <p>{t('series.noSeries')}</p>
           </div>
         )}
       </div>

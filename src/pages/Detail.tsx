@@ -2,14 +2,42 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { tmdb, getImageUrl } from '../services/tmdb';
 import { useWatchlistContext } from '../context/WatchlistContext';
+import { useI18n } from '../context/I18nContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import type { OmdbMovie } from '../types/tmdb';
+
+function addToHistory(movie: OmdbMovie, type: string) {
+  try {
+    const raw = localStorage.getItem('drakkar-history');
+    const list: { id: string; media_type: string; title: string; poster_path: string; viewed_at: number }[] = raw ? JSON.parse(raw) : [];
+    const filtered = list.filter(h => h.id !== movie.imdbID);
+    filtered.unshift({
+      id: movie.imdbID,
+      media_type: type === 'series' ? 'tv' : 'movie',
+      title: movie.Title,
+      poster_path: movie.Poster,
+      viewed_at: Date.now(),
+    });
+    localStorage.setItem('drakkar-history', JSON.stringify(filtered.slice(0, 30)));
+  } catch {}
+}
+
+function parseActors(actors: string): { name: string }[] {
+  if (!actors || actors === 'N/A') return [];
+  return actors.split(', ').map(name => ({ name: name.trim() }));
+}
+
+function parseProduction(prod: string): string[] {
+  if (!prod || prod === 'N/A') return [];
+  return prod.split(' · ').map(s => s.trim());
+}
 
 export default function Detail() {
   const { type, id } = useParams<{ type: string; id: string }>();
   const [detail, setDetail] = useState<OmdbMovie | null>(null);
   const [loading, setLoading] = useState(true);
   const { toggleWatchlist, isInWatchlist } = useWatchlistContext();
+  const { t } = useI18n();
 
   useEffect(() => {
     async function load() {
@@ -17,19 +45,26 @@ export default function Detail() {
       setLoading(true);
       try {
         const data = await tmdb.getById(id);
-        if (data.Response === 'True') setDetail(data);
+        if (data.Response === 'True') {
+          setDetail(data);
+          addToHistory(data, type || 'movie');
+        }
       } catch (err) { console.error(err); }
       finally { setLoading(false); }
     }
     load();
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [id, type]);
 
   if (loading) return <LoadingSpinner />;
-  if (!detail) return <div className="dp"><div className="dp__empty"><p>No encontrado</p></div></div>;
+  if (!detail) return <div className="dp"><div className="dp__empty"><p>{t('detail.noEncontrado')}</p></div></div>;
 
   const mediaType = type as 'movie' | 'tv';
   const inWatchlist = isInWatchlist(detail.imdbID, mediaType);
+  const actors = parseActors(detail.Actors);
+  const directors = detail.Director !== 'N/A' ? detail.Director.split(', ') : [];
+  const writers = detail.Writer !== 'N/A' ? detail.Writer.split(', ').filter((w: string) => !w.includes('(story') && !w.includes('(screenplay') && !w.includes('(written')).slice(0, 3) : [];
+  const production = parseProduction(detail.Production);
 
   return (
     <div className="dp">
@@ -47,13 +82,14 @@ export default function Detail() {
 
           <div className="dp__info">
             <h1 className="dp__title">{detail.Title}</h1>
+            {detail.Tagline && <p className="dp__tagline">"{detail.Tagline}"</p>}
 
             <div className="dp__badges">
               {detail.Year && <span className="dp__badge dp__badge--year">{detail.Year}</span>}
               {detail.Rated !== 'N/A' && <span className="dp__badge dp__badge--rated">{detail.Rated}</span>}
               {detail.Runtime !== 'N/A' && <span className="dp__badge dp__badge--runtime">{detail.Runtime}</span>}
               {detail.Type === 'series' && detail.totalSeasons && (
-                <span className="dp__badge dp__badge--seasons">{detail.totalSeasons} Temp.</span>
+                <span className="dp__badge dp__badge--seasons">{detail.totalSeasons} {t('detail.temporadas')}</span>
               )}
             </div>
 
@@ -78,7 +114,7 @@ export default function Detail() {
                 </div>
                 <div className="dp__score-label">
                   <span>IMDb</span>
-                  <small>{detail.imdbVotes} votos</small>
+                  <small>{detail.imdbVotes} {t('detail.votos')}</small>
                 </div>
               </div>
             )}
@@ -91,77 +127,162 @@ export default function Detail() {
               </div>
             )}
 
-            {detail.Tagline && <p className="dp__tagline">"{detail.Tagline}"</p>}
-
             <p className="dp__plot">{detail.Plot}</p>
 
-            <div className="dp__grid">
-              {detail.Director !== 'N/A' && (
-                <div className="dp__dt"><strong>Director</strong><span>{detail.Director}</span></div>
-              )}
-              {detail.Actors !== 'N/A' && (
-                <div className="dp__dt"><strong>Reparto</strong><span>{detail.Actors}</span></div>
-              )}
-              {detail.Language !== 'N/A' && (
-                <div className="dp__dt"><strong>Idioma</strong><span>{detail.Language}</span></div>
-              )}
-              {detail.Country !== 'N/A' && (
-                <div className="dp__dt"><strong>País</strong><span>{detail.Country}</span></div>
-              )}
-              {detail.Awards !== 'N/A' && (
-                <div className="dp__dt dp__dt--full"><strong>Premios</strong><span>{detail.Awards}</span></div>
-              )}
-            </div>
-
-            {detail.Ratings && detail.Ratings.length > 0 && (
-              <div className="dp__ratings">
-                {detail.Ratings.map((r: { Source: string; Value: string }, i: number) => (
-                  <div key={i} className="dp__rating-card">
-                    <span className="dp__rating-src">{r.Source.replace('Internet Movie Database', 'IMDb').replace('Rotten Tomatoes', 'RT').replace('Metacritic', 'MC')}</span>
-                    <span className="dp__rating-val">{r.Value}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
             <div className="dp__actions">
-              <Link
-                to={`/player/${mediaType}/${detail.imdbID}`}
-                className="dp-btn dp-btn--watch"
-              >
+              <Link to={`/player/${mediaType}/${detail.imdbID}`} className="dp-btn dp-btn--watch">
                 <div className="dp-btn__icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 </div>
                 <div className="dp-btn__text">
-                  <span className="dp-btn__label">Ver {detail.Type === 'series' ? 'Serie' : 'Película'}</span>
-                  <span className="dp-btn__sub">Reproducir ahora</span>
+                  <span className="dp-btn__label">{detail.Type === 'series' ? t('detail.verSerie') : t('detail.verPelicula')}</span>
+                  <span className="dp-btn__sub">{t('detail.reproducir')}</span>
                 </div>
               </Link>
 
-              <button
-                className={`dp-btn dp-btn--list ${inWatchlist ? 'dp-btn--listed' : ''}`}
-                onClick={() => toggleWatchlist({
-                  id: detail.imdbID,
-                  media_type: mediaType,
-                  title: detail.Title,
-                  poster_path: detail.Poster,
-                })}
-              >
+              <button className={`dp-btn dp-btn--list ${inWatchlist ? 'dp-btn--listed' : ''}`}
+                onClick={() => toggleWatchlist({ id: detail.imdbID, media_type: mediaType, title: detail.Title, poster_path: detail.Poster })}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  {inWatchlist ? <path d="M20 6L9 17l-5-5" /> : <><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></>}
+                  {inWatchlist ? <path d="M20 6L9 17l-5-5" /> : <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />}
                 </svg>
-                {inWatchlist ? 'En Mi Lista' : 'Mi Lista'}
+                {inWatchlist ? t('detail.enMiLista') : t('detail.miLista')}
               </button>
 
               {detail.Website && detail.Website !== 'N/A' && (
                 <a href={detail.Website} target="_blank" rel="noopener noreferrer" className="dp-btn dp-btn--web">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                  Sitio Web
+                  {t('detail.sitioWeb')}
                 </a>
               )}
             </div>
           </div>
         </div>
+
+        {/* Info Grid */}
+        <div className="dp__section">
+          <h2 className="dp__section-title">{t('detail.informacion')}</h2>
+          <div className="dp__info-grid">
+            {detail.Runtime !== 'N/A' && (
+              <div className="dp__info-card">
+                <div className="dp__info-icon">🎬</div>
+                <div className="dp__info-label">{t('detail.duracion')}</div>
+                <div className="dp__info-value">{detail.Runtime}</div>
+              </div>
+            )}
+            {detail.Released !== 'N/A' && (
+              <div className="dp__info-card">
+                <div className="dp__info-icon">📅</div>
+                <div className="dp__info-label">{t('detail.estreno')}</div>
+                <div className="dp__info-value">{detail.Released}</div>
+              </div>
+            )}
+            {detail.BoxOffice && detail.BoxOffice !== 'N/A' && (
+              <div className="dp__info-card">
+                <div className="dp__info-icon">💰</div>
+                <div className="dp__info-label">{t('detail.recaudacion')}</div>
+                <div className="dp__info-value">{detail.BoxOffice}</div>
+              </div>
+            )}
+            {detail.Language !== 'N/A' && (
+              <div className="dp__info-card">
+                <div className="dp__info-icon">🌐</div>
+                <div className="dp__info-label">{t('detail.idioma')}</div>
+                <div className="dp__info-value">{detail.Language}</div>
+              </div>
+            )}
+            {detail.Country !== 'N/A' && (
+              <div className="dp__info-card">
+                <div className="dp__info-icon">🌍</div>
+                <div className="dp__info-label">{t('detail.pais')}</div>
+                <div className="dp__info-value">{detail.Country}</div>
+              </div>
+            )}
+            {detail.Awards !== 'N/A' && (
+              <div className="dp__info-card dp__info-card--full">
+                <div className="dp__info-icon">🏆</div>
+                <div className="dp__info-label">{t('detail.premios')}</div>
+                <div className="dp__info-value">{detail.Awards}</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Cast */}
+        {actors.length > 0 && (
+          <div className="dp__section">
+            <h2 className="dp__section-title">{t('detail.reparto')}</h2>
+            <div className="dp__cast-grid">
+              {actors.slice(0, 12).map((a, i) => (
+                <div key={i} className="dp__cast-card">
+                  <div className="dp__cast-avatar">
+                    <span>{a.name.split(' ').map(n => n[0]).join('').slice(0, 2)}</span>
+                  </div>
+                  <div className="dp__cast-name">{a.name}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Directors & Writers */}
+        {(directors.length > 0 || writers.length > 0) && (
+          <div className="dp__section">
+            <h2 className="dp__section-title">{t('detail.equipo')}</h2>
+            <div className="dp__crew-grid">
+              {directors.map((d, i) => (
+                <div key={`d-${i}`} className="dp__crew-card">
+                  <div className="dp__crew-avatar dp__crew-avatar--director">
+                    <span>{d.split(' ').map(n => n[0]).join('').slice(0, 2)}</span>
+                  </div>
+                  <div className="dp__crew-name">{d}</div>
+                  <div className="dp__crew-role">{t('detail.director')}</div>
+                </div>
+              ))}
+              {writers.map((w, i) => (
+                <div key={`w-${i}`} className="dp__crew-card">
+                  <div className="dp__crew-avatar">
+                    <span>{w.split(' ').map(n => n[0]).join('').slice(0, 2)}</span>
+                  </div>
+                  <div className="dp__crew-name">{w}</div>
+                  <div className="dp__crew-role">{t('detail.guionista')}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Production */}
+        {production.length > 0 && (
+          <div className="dp__section">
+            <h2 className="dp__section-title">{t('detail.produccion')}</h2>
+            <div className="dp__prod-list">
+              {production.map((p, i) => (
+                <span key={i} className="dp__prod-tag">{p}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Ratings */}
+        {detail.Ratings && detail.Ratings.length > 0 && (
+          <div className="dp__section">
+            <h2 className="dp__section-title">{t('detail.calificaciones')}</h2>
+            <div className="dp__ratings">
+              {detail.Ratings.map((r, i) => (
+                <div key={i} className="dp__rating-card">
+                  <span className="dp__rating-src">{r.Source.replace('Internet Movie Database', 'IMDb').replace('Rotten Tomatoes', 'Rotten Tomatoes').replace('Metacritic', 'Metacritic')}</span>
+                  <span className="dp__rating-val">{r.Value}</span>
+                </div>
+              ))}
+              {detail.Metascore && detail.Metascore !== 'N/A' && (
+                <div className="dp__rating-card dp__rating-card--meta">
+                  <span className="dp__rating-src">Metacritic</span>
+                  <span className="dp__rating-val">{detail.Metascore}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <style>{`
@@ -229,8 +350,14 @@ export default function Detail() {
           font-size: clamp(2rem, 4vw, 3rem);
           font-weight: 900;
           color: #fff;
-          margin: 0 0 16px;
+          margin: 0 0 8px;
           line-height: 1.1;
+        }
+        .dp__tagline {
+          font-style: italic;
+          color: rgba(168,85,247,0.5);
+          margin: 0 0 12px;
+          font-size: 0.85rem;
         }
 
         .dp__badges {
@@ -308,67 +435,11 @@ export default function Detail() {
         }
         .dp__genre:hover { background: rgba(59, 130, 246, 0.2); }
 
-        .dp__tagline {
-          font-style: italic;
-          color: rgba(168,85,247,0.5);
-          margin: 0 0 14px;
-          font-size: 0.88rem;
-        }
         .dp__plot {
           color: rgba(255,255,255,0.65);
           line-height: 1.75;
           margin: 0 0 24px;
           font-size: 0.92rem;
-        }
-
-        .dp__grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-          gap: 14px;
-          margin-bottom: 24px;
-        }
-        .dp__dt { display: flex; flex-direction: column; gap: 3px; }
-        .dp__dt--full { grid-column: 1 / -1; }
-        .dp__dt strong {
-          font-size: 0.65rem;
-          color: rgba(251,191,36,0.6);
-          text-transform: uppercase;
-          letter-spacing: 1.5px;
-          font-weight: 700;
-        }
-        .dp__dt span {
-          font-size: 0.85rem;
-          color: rgba(255,255,255,0.75);
-          line-height: 1.4;
-        }
-
-        .dp__ratings {
-          display: flex;
-          gap: 10px;
-          margin-bottom: 28px;
-          flex-wrap: wrap;
-        }
-        .dp__rating-card {
-          padding: 10px 16px;
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.06);
-          border-radius: 10px;
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-          min-width: 80px;
-        }
-        .dp__rating-src {
-          font-size: 0.58rem;
-          color: rgba(255,255,255,0.3);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          font-weight: 600;
-        }
-        .dp__rating-val {
-          font-size: 0.9rem;
-          font-weight: 800;
-          color: #fbbf24;
         }
 
         /* Actions */
@@ -437,15 +508,211 @@ export default function Detail() {
           color: rgba(255,255,255,0.3);
         }
 
+        /* Sections */
+        .dp__section {
+          margin-top: 48px;
+          animation: dpFadeIn 0.6s ease-out;
+        }
+        .dp__section-title {
+          font-size: 0.75rem;
+          font-weight: 700;
+          color: var(--accent-gold);
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid rgba(251,191,36,0.1);
+        }
+
+        /* Info Grid */
+        .dp__info-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+          gap: 12px;
+        }
+        .dp__info-card {
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.06);
+          border-radius: 12px;
+          padding: 16px;
+          transition: all 0.2s;
+        }
+        .dp__info-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+        .dp__info-card--full { grid-column: 1 / -1; }
+        .dp__info-icon { font-size: 1.2rem; margin-bottom: 8px; }
+        .dp__info-label {
+          font-size: 0.6rem;
+          font-weight: 700;
+          color: rgba(255,255,255,0.3);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-bottom: 4px;
+        }
+        .dp__info-value {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: rgba(255,255,255,0.85);
+          line-height: 1.4;
+        }
+
+        /* Cast */
+        .dp__cast-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          gap: 12px;
+        }
+        .dp__cast-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          padding: 20px 12px;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.06);
+          border-radius: 14px;
+          text-align: center;
+          transition: all 0.25s;
+        }
+        .dp__cast-card:hover {
+          background: rgba(168,85,247,0.08);
+          border-color: rgba(168,85,247,0.15);
+          transform: translateY(-4px);
+        }
+        .dp__cast-avatar {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(96,165,250,0.15));
+          border: 2px solid rgba(168,85,247,0.2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.8rem;
+          font-weight: 800;
+          color: var(--accent-purple-light);
+        }
+        .dp__cast-name {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: rgba(255,255,255,0.8);
+          line-height: 1.3;
+        }
+
+        /* Crew */
+        .dp__crew-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+          gap: 12px;
+        }
+        .dp__crew-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          padding: 20px 14px;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.06);
+          border-radius: 14px;
+          text-align: center;
+          transition: all 0.25s;
+        }
+        .dp__crew-card:hover {
+          background: rgba(251,191,36,0.06);
+          border-color: rgba(251,191,36,0.12);
+          transform: translateY(-4px);
+        }
+        .dp__crew-avatar {
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(168,85,247,0.1));
+          border: 2px solid rgba(251,191,36,0.15);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.75rem;
+          font-weight: 800;
+          color: var(--accent-gold);
+        }
+        .dp__crew-avatar--director {
+          background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(251,191,36,0.1));
+          border-color: rgba(168,85,247,0.2);
+          color: var(--accent-purple-light);
+        }
+        .dp__crew-name {
+          font-size: 0.78rem;
+          font-weight: 600;
+          color: rgba(255,255,255,0.85);
+        }
+        .dp__crew-role {
+          font-size: 0.6rem;
+          font-weight: 600;
+          color: rgba(255,255,255,0.35);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        /* Production */
+        .dp__prod-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .dp__prod-tag {
+          padding: 8px 16px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 20px;
+          font-size: 0.78rem;
+          font-weight: 500;
+          color: rgba(255,255,255,0.7);
+          transition: all 0.2s;
+        }
+        .dp__prod-tag:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+        /* Ratings */
+        .dp__ratings {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .dp__rating-card {
+          padding: 14px 20px;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.06);
+          border-radius: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          min-width: 100px;
+          transition: all 0.2s;
+        }
+        .dp__rating-card:hover { background: rgba(255,255,255,0.06); }
+        .dp__rating-card--meta { border-color: rgba(251,191,36,0.15); }
+        .dp__rating-src {
+          font-size: 0.58rem;
+          color: rgba(255,255,255,0.3);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 600;
+        }
+        .dp__rating-val {
+          font-size: 1rem;
+          font-weight: 800;
+          color: #fbbf24;
+        }
+
         @media (max-width: 768px) {
           .dp__hero { flex-direction: column; align-items: center; }
           .dp__poster { width: 200px; }
           .dp__title { font-size: 1.8rem; text-align: center; }
           .dp__wrap { padding-top: 80px; }
           .dp__genres, .dp__badges, .dp__score { justify-content: center; }
-          .dp__grid { grid-template-columns: 1fr; }
           .dp__actions { flex-direction: column; }
           .dp-btn { justify-content: center; width: 100%; }
+          .dp__cast-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+          .dp__crew-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+          .dp__info-grid { grid-template-columns: 1fr 1fr; }
         }
       `}</style>
     </div>

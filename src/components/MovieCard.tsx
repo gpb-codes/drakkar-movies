@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { getImageUrl } from '../services/tmdb';
+import { useI18n } from '../context/I18nContext';
 import type { OmdbSearchResult } from '../types/tmdb';
 import './MovieCard.css';
 
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function MovieCard({ movie, size = 'md' }: Props) {
+  const { t } = useI18n();
   const mediaType = movie.Type === 'series' ? 'tv' : 'movie';
 
   return (
@@ -26,7 +28,7 @@ export default function MovieCard({ movie, size = 'md' }: Props) {
       <div className="card__text">
         <h3 className="card__title">{movie.Title}</h3>
         <span className={`card__type card__type--${movie.Type}`}>
-          {movie.Type === 'series' ? 'Serie' : 'Película'}
+          {movie.Type === 'series' ? t('card.serie') : t('card.pelicula')}
         </span>
       </div>
     </Link>

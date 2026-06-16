@@ -2,40 +2,43 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { tmdb } from '../services/tmdb';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useI18n } from '../context/I18nContext';
 import type { OmdbMovie } from '../types/tmdb';
 
-const SERVERS = [
-  {
-    id: '1', name: 'Servidor 1', icon: '▶',
-    url: (id: string, type: string, s?: string, e?: string) =>
-      type === 'tv' && s && e
-        ? `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}`
-        : `https://www.2embed.cc/embed/${id}`
-  },
-  {
-    id: '2', name: 'Servidor 2', icon: '◆',
-    url: (id: string, type: string, s?: string, e?: string) =>
-      type === 'tv' && s && e
-        ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`
-        : `https://multiembed.mov/?video_id=${id}&tmdb=1`
-  },
-  {
-    id: '3', name: 'Servidor 3', icon: '⚡',
-    url: (id: string, type: string, s?: string, e?: string) =>
-      type === 'tv' && s && e
-        ? `https://embed.su/embed/tv/${id}/${s}/${e}`
-        : `https://embed.su/embed/movie/${id}`
-  },
-  {
-    id: '4', name: 'Servidor 4', icon: '★',
-    url: (id: string, type: string, s?: string, e?: string) =>
-      type === 'tv' && s && e
-        ? `https://autoembed.cc/embed/tv/${id}/${s}/${e}`
-        : `https://autoembed.cc/embed/movie/${id}`
-  },
-];
-
 export default function Player() {
+  const { t } = useI18n();
+
+  const SERVERS = [
+    {
+      id: '1', name: t('player.servidor1'), icon: '▶',
+      url: (id: string, type: string, s?: string, e?: string) =>
+        type === 'tv' && s && e
+          ? `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}`
+          : `https://www.2embed.cc/embed/${id}`
+    },
+    {
+      id: '2', name: t('player.servidor2'), icon: '◆',
+      url: (id: string, type: string, s?: string, e?: string) =>
+        type === 'tv' && s && e
+          ? `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}`
+          : `https://multiembed.mov/?video_id=${id}&tmdb=1`
+    },
+    {
+      id: '3', name: t('player.servidor3'), icon: '⚡',
+      url: (id: string, type: string, s?: string, e?: string) =>
+        type === 'tv' && s && e
+          ? `https://embed.su/embed/tv/${id}/${s}/${e}`
+          : `https://embed.su/embed/movie/${id}`
+    },
+    {
+      id: '4', name: t('player.servidor4'), icon: '★',
+      url: (id: string, type: string, s?: string, e?: string) =>
+        type === 'tv' && s && e
+          ? `https://autoembed.cc/embed/tv/${id}/${s}/${e}`
+          : `https://autoembed.cc/embed/movie/${id}`
+    },
+  ];
+
   const { type, id, season, episode } = useParams<{ type: string; id: string; season?: string; episode?: string }>();
   const [detail, setDetail] = useState<OmdbMovie | null>(null);
   const [server, setServer] = useState(0);
@@ -59,7 +62,7 @@ export default function Player() {
   };
 
   if (loading) return <LoadingSpinner />;
-  if (!detail) return <div className="pl"><div className="pl__empty"><p>No encontrado</p></div></div>;
+  if (!detail) return <div className="pl"><div className="pl__empty"><p>{t('player.noEncontrado')}</p></div></div>;
 
   const src = SERVERS[server].url(id || '', type || 'movie', season, episode);
   const isTv = type === 'tv';
@@ -77,7 +80,7 @@ export default function Player() {
             <span className="pl__ep-badge">T{season} · E{episode}</span>
           )}
         </div>
-        <button className="pl__icon-btn" onClick={() => setShowInfo(!showInfo)} title="Info">
+        <button className="pl__icon-btn" onClick={() => setShowInfo(!showInfo)} title={t('player.info')}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
         </button>
       </div>
@@ -111,7 +114,7 @@ export default function Player() {
 
       <div className="pl__bottom">
         <div className="pl__servers">
-          <span className="pl__servers-label">Servidor</span>
+          <span className="pl__servers-label">{t('player.servidor')}</span>
           <div className="pl__servers-grid">
             {SERVERS.map((s, i) => (
               <button
@@ -121,11 +124,11 @@ export default function Player() {
               >
                 <span className="srv__icon">{s.icon}</span>
                 <span className="srv__name">{s.name}</span>
-                {i === server && <span className="srv__live">LIVE</span>}
+                {i === server && <span className="srv__live">{t('player.live')}</span>}
               </button>
             ))}
           </div>
-          <p className="pl__server-hint">¿No reproduce? Prueba otro servidor</p>
+          <p className="pl__server-hint">{t('player.noReproduce')}</p>
         </div>
 
         {isTv && (
@@ -133,12 +136,12 @@ export default function Player() {
             {Number(episode) > 1 && (
               <Link to={`/player/tv/${id}/${season}/${Number(episode) - 1}`} className="ep-nav ep-nav--prev">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-                Ep. {Number(episode) - 1}
+                {t('player.episodio')} {Number(episode) - 1}
               </Link>
             )}
             {Number(episode) < (detail.totalSeasons ? parseInt(detail.totalSeasons) * 10 : 100) && (
               <Link to={`/player/tv/${id}/${season}/${Number(episode) + 1}`} className="ep-nav ep-nav--next">
-                Ep. {Number(episode) + 1}
+                {t('player.episodio')} {Number(episode) + 1}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6"/></svg>
               </Link>
             )}
