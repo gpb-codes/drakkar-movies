@@ -113,7 +113,8 @@ export default function Navbar() {
 
         <div className="nb__actions">
           <button className="nb__lang" onClick={() => setLang(lang === 'es' ? 'en' : 'es')} title={lang === 'es' ? 'English' : 'Español'}>
-            {lang === 'es' ? 'EN' : 'ES'}
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+            <span>{lang === 'es' ? 'EN' : 'ES'}</span>
           </button>
           <a href={DONATION_CONFIG.paypalUrl} target="_blank" rel="noopener noreferrer" className="nb__donate" title={t('donate.apoya')}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -133,29 +134,48 @@ export default function Navbar() {
       {/* Bottom Nav - Mobile */}
       <nav className="nb-bottom">
         <Link to="/" className={`nb-bottom__item ${location.pathname === '/' ? 'nb-bottom__item--on' : ''}`}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          <div className="nb-bottom__icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          </div>
           <span>{t('nav.inicio')}</span>
         </Link>
         <Link to="/series" className={`nb-bottom__item ${location.pathname === '/series' ? 'nb-bottom__item--on' : ''}`}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+          <div className="nb-bottom__icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+          </div>
           <span>{t('nav.series')}</span>
         </Link>
         <Link to="/search" className={`nb-bottom__item ${location.pathname === '/search' ? 'nb-bottom__item--on' : ''}`}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <div className="nb-bottom__icon nb-bottom__icon--search">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </div>
           <span>{t('nav.buscar')}</span>
         </Link>
         <Link to="/watchlist" className={`nb-bottom__item ${location.pathname === '/watchlist' ? 'nb-bottom__item--on' : ''}`}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          <div className="nb-bottom__icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+            {watchlist.length > 0 && <span className="nb-bottom__dot">{watchlist.length}</span>}
+          </div>
           <span>{t('nav.miLista')}</span>
-          {watchlist.length > 0 && <span className="nb-bottom__dot">{watchlist.length}</span>}
         </Link>
         <a href={DONATION_CONFIG.paypalUrl} target="_blank" rel="noopener noreferrer" className="nb-bottom__item">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <div className="nb-bottom__icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
           <span>{t('nav.donar')}</span>
         </a>
       </nav>
 
       <style>{`
+        @keyframes nbGlow {
+          0%, 100% { filter: drop-shadow(0 0 6px rgba(168,85,247,0.3)); }
+          50% { filter: drop-shadow(0 0 14px rgba(168,85,247,0.5)); }
+        }
+        @keyframes nbPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.3); }
+          50% { box-shadow: 0 0 0 4px rgba(251,191,36,0.08); }
+        }
+
         .nb {
           --h: 56px;
           position: fixed;
@@ -164,10 +184,10 @@ export default function Navbar() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 clamp(12px, 3vw, 36px);
+          padding: 0 clamp(16px, 3vw, 40px);
           height: var(--h);
           background: transparent;
-          transition: background 0.4s, box-shadow 0.4s, backdrop-filter 0.4s;
+          transition: background 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s cubic-bezier(0.4,0,0.2,1), backdrop-filter 0.4s cubic-bezier(0.4,0,0.2,1);
         }
         .nb--solid {
           background: rgba(6, 2, 15, 0.82);
@@ -176,8 +196,21 @@ export default function Navbar() {
         }
 
         /* Brand */
-        .nb__brand { display: flex; align-items: center; gap: 10px; z-index: 1002; text-decoration: none; }
-        .nb__logo { flex-shrink: 0; filter: drop-shadow(0 0 8px rgba(168,85,247,0.3)); }
+        .nb__brand {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          z-index: 1002;
+          text-decoration: none;
+        }
+        .nb__logo {
+          flex-shrink: 0;
+          filter: drop-shadow(0 0 8px rgba(168,85,247,0.3));
+          transition: filter 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        .nb__brand:hover .nb__logo {
+          animation: nbGlow 2s ease-in-out infinite;
+        }
         .nb__wordmark { display: flex; flex-direction: column; line-height: 1; gap: 1px; }
         .nb__name {
           font-size: 0.85rem;
@@ -187,6 +220,10 @@ export default function Navbar() {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
+          transition: filter 0.3s;
+        }
+        .nb__brand:hover .nb__name {
+          filter: brightness(1.2);
         }
         .nb__sub {
           font-size: 0.48rem;
@@ -214,11 +251,39 @@ export default function Navbar() {
           border: none;
           background: none;
           cursor: pointer;
-          transition: color 0.2s, background 0.2s;
+          transition: color 0.2s cubic-bezier(0.4,0,0.2,1), background 0.2s cubic-bezier(0.4,0,0.2,1);
           white-space: nowrap;
+          position: relative;
         }
-        .nb__item:hover { color: #fff; background: rgba(255,255,255,0.04); }
-        .nb__item--on { color: var(--accent-purple-light); }
+        .nb__item::after {
+          content: '';
+          position: absolute;
+          bottom: 2px;
+          left: 50%;
+          width: 0;
+          height: 2px;
+          background: var(--accent-purple-light);
+          border-radius: 1px;
+          transform: translateX(-50%);
+          transition: width 0.25s cubic-bezier(0.4,0,0.2,1);
+          opacity: 0;
+        }
+        .nb__item:hover {
+          color: #fff;
+          background: rgba(255,255,255,0.04);
+        }
+        .nb__item:hover::after {
+          width: calc(100% - 16px);
+          opacity: 1;
+        }
+        .nb__item--on {
+          color: var(--accent-purple-light);
+        }
+        .nb__item--on::after {
+          width: calc(100% - 16px);
+          opacity: 1;
+          background: var(--accent-purple-light);
+        }
         .nb__item--btn { font-family: inherit; }
         .nb__dot {
           font-size: 0.55rem;
@@ -228,6 +293,7 @@ export default function Navbar() {
           padding: 1px 5px;
           border-radius: 8px;
           line-height: 1;
+          animation: nbPulse 2s ease-in-out infinite;
         }
 
         /* Dropdown */
@@ -266,25 +332,25 @@ export default function Navbar() {
           border: none;
           border-radius: var(--radius-sm);
           cursor: pointer;
-          transition: all 0.15s;
+          transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
           text-align: left;
           font-family: inherit;
         }
-        .nb__genre:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .nb__genre:hover { background: rgba(255,255,255,0.06); color: #fff; transform: translateX(2px); }
 
         /* Actions */
         .nb__actions {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
           z-index: 1002;
         }
         .nb__lang {
-          width: 28px;
-          height: 28px;
           display: flex;
           align-items: center;
-          justify-content: center;
+          gap: 4px;
+          height: 30px;
+          padding: 0 10px;
           font-size: 0.6rem;
           font-weight: 800;
           color: var(--accent-gold);
@@ -292,10 +358,21 @@ export default function Navbar() {
           border: 1px solid rgba(251,191,36,0.15);
           border-radius: 6px;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
           letter-spacing: 0.5px;
         }
-        .nb__lang:hover { background: rgba(251,191,36,0.15); transform: scale(1.05); }
+        .nb__lang svg {
+          opacity: 0.7;
+          transition: opacity 0.2s;
+        }
+        .nb__lang:hover {
+          background: rgba(251,191,36,0.15);
+          border-color: rgba(251,191,36,0.3);
+          transform: scale(1.05);
+        }
+        .nb__lang:hover svg {
+          opacity: 1;
+        }
         .nb__donate {
           display: flex;
           align-items: center;
@@ -308,9 +385,32 @@ export default function Navbar() {
           border: 1px solid rgba(251,191,36,0.12);
           border-radius: 8px;
           text-decoration: none;
-          transition: all 0.2s;
+          transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+          position: relative;
+          overflow: hidden;
         }
-        .nb__donate:hover { background: rgba(251,191,36,0.12); transform: translateY(-1px); }
+        .nb__donate::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, rgba(251,191,36,0.1) 0%, rgba(236,72,153,0.06) 100%);
+          opacity: 0;
+          transition: opacity 0.25s;
+        }
+        .nb__donate:hover {
+          background: rgba(251,191,36,0.12);
+          border-color: rgba(251,191,36,0.25);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 16px rgba(251,191,36,0.15);
+          backdrop-filter: blur(12px);
+        }
+        .nb__donate:hover::before {
+          opacity: 1;
+        }
+        .nb__donate svg, .nb__donate span {
+          position: relative;
+          z-index: 1;
+        }
         .nb__search {
           width: 32px;
           height: 32px;
@@ -319,7 +419,7 @@ export default function Navbar() {
           justify-content: center;
           color: var(--text-secondary);
           border-radius: 8px;
-          transition: all 0.2s;
+          transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
         }
         .nb__search:hover { color: #fff; background: rgba(255,255,255,0.06); }
         .nb__burger {
@@ -338,7 +438,8 @@ export default function Navbar() {
           height: 1.5px;
           background: var(--text-secondary);
           border-radius: 2px;
-          transition: all 0.3s;
+          transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+          transform-origin: center;
         }
         .nb__bar--x:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
         .nb__bar--x:nth-child(2) { opacity: 0; }
@@ -363,11 +464,18 @@ export default function Navbar() {
             justify-content: center;
             gap: 6px;
             opacity: 0; visibility: hidden;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
             z-index: 1001;
           }
           .nb__nav--open { opacity: 1; visibility: visible; }
-          .nb__item { font-size: 0.95rem; padding: 14px 28px; gap: 10px; width: 220px; justify-content: center; border-radius: var(--radius-md); }
+          .nb__item {
+            font-size: 0.95rem;
+            padding: 14px 28px;
+            gap: 10px;
+            width: 220px;
+            justify-content: center;
+            border-radius: var(--radius-md);
+          }
           .nb__drop { width: auto; }
           .nb__panel {
             position: static; transform: none;
@@ -410,17 +518,55 @@ export default function Navbar() {
           font-size: 0.55rem;
           font-weight: 600;
           border-radius: 10px;
-          transition: all 0.2s;
+          transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
           position: relative;
           min-width: 52px;
         }
+        .nb-bottom__icon {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+        }
+        .nb-bottom__icon--search {
+          width: 38px;
+          height: 38px;
+          background: linear-gradient(135deg, #a855f7, #7c3aed);
+          border-radius: 50%;
+          margin-top: -12px;
+          box-shadow: 0 4px 16px rgba(168,85,247,0.35);
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .nb-bottom__icon--search svg {
+          width: 18px;
+          height: 18px;
+          color: #fff;
+        }
+        .nb-bottom__item:active .nb-bottom__icon--search {
+          transform: scale(0.92);
+        }
         .nb-bottom__item svg { width: 20px; height: 20px; }
         .nb-bottom__item--on { color: var(--accent-purple-light); }
-        .nb-bottom__item--on svg { filter: drop-shadow(0 0 6px rgba(168,85,247,0.4)); }
+        .nb-bottom__item--on .nb-bottom__icon {
+          filter: drop-shadow(0 0 6px rgba(168,85,247,0.4));
+        }
+        .nb-bottom__item--on::before {
+          content: '';
+          position: absolute;
+          top: -1px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 16px;
+          height: 2px;
+          background: var(--accent-purple-light);
+          border-radius: 1px;
+        }
         .nb-bottom__dot {
           position: absolute;
-          top: 2px;
-          right: 6px;
+          top: -4px;
+          right: -6px;
           font-size: 0.5rem;
           font-weight: 700;
           background: var(--accent-gold);
