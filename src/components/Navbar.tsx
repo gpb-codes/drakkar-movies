@@ -40,7 +40,13 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isFullscreen = location.pathname.startsWith('/player') || location.pathname.startsWith('/detail');
+
   useEffect(() => {
+    if (isFullscreen) {
+      setHidden(true);
+      return;
+    }
     let lastY = window.scrollY;
     const onScroll = () => {
       const y = window.scrollY;
@@ -50,7 +56,7 @@ export default function Navbar() {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [isFullscreen]);
 
   useEffect(() => {
     setMobileOpen(false);
