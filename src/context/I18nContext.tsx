@@ -139,6 +139,18 @@ const translations: Record<Lang, Record<string, string>> = {
 
     // Donation
     'donate.apoya': 'Apoya al proyecto con una donación',
+
+    // Footer
+    'footer.tagline': 'Tu plataforma de streaming favorita. Películas y series al alcance de un clic.',
+    'footer.navegacion': 'Navegación',
+    'footer.generos': 'Géneros',
+    'footer.soporte': 'Soporte',
+    'footer.derechos': 'Todos los derechos reservados.',
+
+    // Not Found
+    'notFound.title': 'Página No Encontrada',
+    'notFound.desc': 'La página que buscas no existe o fue movida.',
+    'notFound.home': 'Volver al Inicio',
   },
   en: {
     // Navbar
@@ -270,6 +282,18 @@ const translations: Record<Lang, Record<string, string>> = {
 
     // Donation
     'donate.apoya': 'Support the project with a donation',
+
+    // Footer
+    'footer.tagline': 'Your favorite streaming platform. Movies and series at your fingertips.',
+    'footer.navegacion': 'Navigation',
+    'footer.generos': 'Genres',
+    'footer.soporte': 'Support',
+    'footer.derechos': 'All rights reserved.',
+
+    // Not Found
+    'notFound.title': 'Page Not Found',
+    'notFound.desc': 'The page you are looking for does not exist or was moved.',
+    'notFound.home': 'Back to Home',
   },
 };
 

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import { WatchlistProvider } from './context/WatchlistContext';
 
@@ -12,6 +13,7 @@ const Player = lazy(() => import('./pages/Player'));
 const Watchlist = lazy(() => import('./pages/Watchlist'));
 const Genre = lazy(() => import('./pages/Genre'));
 const Upcoming = lazy(() => import('./pages/Upcoming'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 export default function App() {
   return (
@@ -30,8 +32,10 @@ export default function App() {
               <Route path="/watchlist" element={<Watchlist />} />
               <Route path="/genre/:id" element={<Genre />} />
               <Route path="/upcoming" element={<Upcoming />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
+          <Footer />
         </div>
       </WatchlistProvider>
     </BrowserRouter>

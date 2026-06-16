@@ -1,0 +1,16 @@
+{
+  "name": "Drakkar Movies",
+  "short_name": "Drakkar",
+  "description": "Explora y reproduce películas y series online",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06020f",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
