@@ -79,6 +79,17 @@ export default function Player() {
           ? `https://multiembed.mov/?video_id=${mid}&tmdb=1&s=${s}&e=${e}`
           : `https://multiembed.mov/?video_id=${mid}&tmdb=1`,
     },
+    {
+      id: '5',
+      name: 'NexStream',
+      url: (mid: string, tp: string, s?: string, e?: string) => {
+        const key = import.meta.env.VITE_NEXSTREAM_API_KEY || '';
+        if (!key) return 'about:blank';
+        return tp === 'tv' && s && e
+          ? `https://api.codespecters.com/embed/tv/${mid}/${s}/${e}?apikey=${key}`
+          : `https://api.codespecters.com/embed/movie/${mid}?apikey=${key}`;
+      },
+    },
   ];
 
   useEffect(() => {
