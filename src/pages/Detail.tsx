@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { tmdb, getImageUrl } from '../services/tmdb';
+import { tmdb, getImageUrl, getActorImageUrl } from '../services/tmdb';
 import { useWatchlistContext } from '../context/WatchlistContext';
 import { useI18n } from '../context/I18nContext';
 import { addToHistory } from '../services/history';
@@ -364,10 +364,21 @@ export default function Detail() {
                 {actors.map((a, i) => {
                   const color = AVATAR_COLORS[i % AVATAR_COLORS.length];
                   const initials = a.name.split(' ').map(n => n[0]).join('').slice(0, 2);
+                  const actorImg = getActorImageUrl(a.name, i);
                   return (
                     <div key={i} className="dp__cast-card" style={{ '--cast-color': color } as React.CSSProperties}>
                       <div className="dp__cast-avatar" style={{ background: `linear-gradient(135deg, ${color}25, ${color}0a)`, borderColor: color + '30' }}>
-                        <span style={{ color }}>{initials}</span>
+                        <img
+                          src={actorImg}
+                          alt={a.name}
+                          className="dp__cast-photo"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling?.setAttribute('style', 'display: flex');
+                          }}
+                        />
+                        <span style={{ color, display: 'none' }}>{initials}</span>
                       </div>
                       <div className="dp__cast-name">{a.name}</div>
                     </div>
@@ -1068,6 +1079,13 @@ export default function Detail() {
           font-size: 0.82rem;
           font-weight: 800;
           transition: all 0.3s;
+          overflow: hidden;
+        }
+        .dp__cast-photo {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 50%;
         }
         .dp__cast-card:hover .dp__cast-avatar {
           transform: scale(1.12);

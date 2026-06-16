@@ -49,15 +49,15 @@ export default function Player() {
   const SERVERS = [
     {
       id: '1',
-      name: t('player.servidor1'),
+      name: 'EzVideo',
       url: (mid: string, tp: string, s?: string, e?: string) =>
         tp === 'tv' && s && e
-          ? `https://www.2embed.cc/embedtv/${mid}&s=${s}&e=${e}`
-          : `https://www.2embed.cc/embed/${mid}`,
+          ? `https://ezvidapi.com/embed/tv/${mid}/${s}/${e}`
+          : `https://ezvidapi.com/embed/movie/${mid}`,
     },
     {
       id: '2',
-      name: t('player.servidor2'),
+      name: 'SuperEmbed',
       url: (mid: string, tp: string, s?: string, e?: string) =>
         tp === 'tv' && s && e
           ? `https://multiembed.mov/?video_id=${mid}&tmdb=1&s=${s}&e=${e}`
@@ -65,19 +65,19 @@ export default function Player() {
     },
     {
       id: '3',
-      name: t('player.servidor3'),
+      name: 'StreamSrc',
+      url: (mid: string, tp: string, s?: string, e?: string) =>
+        tp === 'tv' && s && e
+          ? `https://streamsrc.cc/watch/series/tmdbid=${mid}`
+          : `https://streamsrc.cc/watch/movie/tmdbid=${mid}`,
+    },
+    {
+      id: '4',
+      name: 'EmbedSU',
       url: (mid: string, tp: string, s?: string, e?: string) =>
         tp === 'tv' && s && e
           ? `https://embed.su/embed/tv/${mid}/${s}/${e}`
           : `https://embed.su/embed/movie/${mid}`,
-    },
-    {
-      id: '4',
-      name: t('player.servidor4'),
-      url: (mid: string, tp: string, s?: string, e?: string) =>
-        tp === 'tv' && s && e
-          ? `https://autoembed.cc/embed/tv/${mid}/${s}/${e}`
-          : `https://autoembed.cc/embed/movie/${mid}`,
     },
   ];
 

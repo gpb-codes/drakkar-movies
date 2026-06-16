@@ -8,6 +8,17 @@ export const getImageUrl = (url: string | null): string => {
   return url;
 };
 
+export const getActorImageUrl = (name: string, index: number = 0): string => {
+  const cleanName = name.toLowerCase().replace(/[^a-z]/g, '');
+  const hash = cleanName.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const id = ((hash + index) % 100) + 1;
+  return `https://www.loremfaces.net/256/id/${id}.jpg`;
+};
+
+export const getPosterUrl = (imdbId: string): string => {
+  return `https://img.omdbapi.com/?i=${imdbId}&h=600&apikey=${API_KEY}`;
+};
+
 async function fetchOMDB(params: Record<string, string>): Promise<any> {
   const url = new URL(BASE_URL);
   url.searchParams.set('apikey', API_KEY);
