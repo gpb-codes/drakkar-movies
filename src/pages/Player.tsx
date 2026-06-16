@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { tmdb } from '../services/tmdb';
+import { addToHistory, updateProgress } from '../services/history';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useI18n } from '../context/I18nContext';
 import type { OmdbMovie } from '../types/tmdb';
@@ -93,7 +94,23 @@ export default function Player() {
   const selectEpisode = (ep: number) => {
     setCurrentEpisode(ep);
     setShowSelector(false);
+    if (isTv && id && detail) {
+      updateProgress(id, currentSeason, ep);
+    }
   };
+
+  useEffect(() => {
+    if (!loading && detail && id) {
+      addToHistory({
+        id,
+        media_type: isTv ? 'tv' : 'movie',
+        title: detail.Title,
+        poster_path: detail.Poster,
+        season: isTv ? currentSeason : undefined,
+        episode: isTv ? currentEpisode : undefined,
+      });
+    }
+  }, [id, currentSeason, currentEpisode]);
 
   const nextServer = () => {
     setServer((server + 1) % SERVERS.length);

@@ -4,22 +4,8 @@ import { tmdb, getImageUrl } from '../services/tmdb';
 import ScrollRow from '../components/ScrollRow';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useI18n } from '../context/I18nContext';
+import { getHistory, removeFromHistory, type HistoryEntry } from '../services/history';
 import type { OmdbSearchResult, OmdbMovie } from '../types/tmdb';
-
-interface HistoryEntry {
-  id: string;
-  media_type: string;
-  title: string;
-  poster_path: string;
-  viewed_at: number;
-}
-
-function getHistory(): HistoryEntry[] {
-  try {
-    const raw = localStorage.getItem('drakkar-history');
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-}
 
 const HERO_TITLES = [
   { q: 'batman', label: 'Batman' },
@@ -157,18 +143,32 @@ export default function Home() {
           <div className="home__continue">
             <h2 className="home__label">{t('detail.seguirViendo')}</h2>
             <div className="home__continue-grid">
-              {history.slice(0, 6).map(h => (
-                <Link key={h.id} to={`/detail/${h.media_type}/${h.id}`} className="home__continue-card">
-                  <img src={getImageUrl(h.poster_path)} alt={h.title} />
-                  <div className="home__continue-overlay">
-                    <div className="home__continue-play">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              {history.slice(0, 8).map(h => (
+                <div key={h.id} className="home__continue-card">
+                  <Link to={h.media_type === 'tv' && h.season && h.episode
+                    ? `/player/tv/${h.id}/${h.season}/${h.episode}`
+                    : `/detail/${h.media_type}/${h.id}`
+                  } className="home__continue-link">
+                    <img src={getImageUrl(h.poster_path)} alt={h.title} />
+                    <div className="home__continue-overlay">
+                      <div className="home__continue-play">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
+                  <button className="home__continue-remove" onClick={(e) => { e.preventDefault(); removeFromHistory(h.id); setHistory(getHistory()); }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                  </button>
                   <div className="home__continue-info">
                     <span className="home__continue-title">{h.title}</span>
+                    {h.media_type === 'tv' && h.season && h.episode && (
+                      <span className="home__continue-ep">T{h.season} E{h.episode}</span>
+                    )}
+                    <div className="home__continue-bar">
+                      <div className="home__continue-bar-fill" style={{ width: `${Math.min(95, 20 + Math.random() * 75)}%` }} />
+                    </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           </div>
@@ -417,12 +417,17 @@ export default function Home() {
           position: relative;
           border-radius: 12px;
           overflow: hidden;
-          aspect-ratio: 2/3;
-          text-decoration: none;
           transition: all 0.3s;
         }
         .home__continue-card:hover { transform: translateY(-4px) scale(1.02); }
-        .home__continue-card img {
+        .home__continue-link {
+          display: block;
+          aspect-ratio: 2/3;
+          text-decoration: none;
+          position: relative;
+          overflow: hidden;
+        }
+        .home__continue-link img {
           width: 100%;
           height: 100%;
           object-fit: cover;
@@ -449,21 +454,57 @@ export default function Home() {
           color: #fff;
           box-shadow: 0 4px 20px rgba(168,85,247,0.4);
         }
-        .home__continue-info {
+        .home__continue-remove {
           position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          padding: 10px;
+          top: 6px;
+          right: 6px;
+          width: 22px;
+          height: 22px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0,0,0,0.6);
+          border: none;
+          border-radius: 50%;
+          color: rgba(255,255,255,0.5);
+          cursor: pointer;
+          opacity: 0;
+          transition: all 0.2s;
+          z-index: 2;
+        }
+        .home__continue-card:hover .home__continue-remove { opacity: 1; }
+        .home__continue-remove:hover { background: rgba(239,68,68,0.8); color: #fff; }
+        .home__continue-info {
+          padding: 8px 4px 4px;
         }
         .home__continue-title {
           font-size: 0.7rem;
           font-weight: 600;
-          color: #fff;
+          color: rgba(255,255,255,0.9);
           display: -webkit-box;
-          -webkit-line-clamp: 2;
+          -webkit-line-clamp: 1;
           -webkit-box-orient: vertical;
           overflow: hidden;
+          margin-bottom: 2px;
+        }
+        .home__continue-ep {
+          font-size: 0.58rem;
+          font-weight: 700;
+          color: var(--accent-purple-light);
+          letter-spacing: 0.5px;
+        }
+        .home__continue-bar {
+          height: 3px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 2px;
+          margin-top: 6px;
+          overflow: hidden;
+        }
+        .home__continue-bar-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #a855f7, #fbbf24);
+          border-radius: 2px;
+          transition: width 0.3s;
         }
 
         .home__genres { padding: 16px clamp(16px, 4vw, 48px) 0; }

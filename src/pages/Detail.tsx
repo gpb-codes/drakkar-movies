@@ -3,24 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { tmdb, getImageUrl } from '../services/tmdb';
 import { useWatchlistContext } from '../context/WatchlistContext';
 import { useI18n } from '../context/I18nContext';
+import { addToHistory } from '../services/history';
 import LoadingSpinner from '../components/LoadingSpinner';
 import type { OmdbMovie } from '../types/tmdb';
-
-function addToHistory(movie: OmdbMovie, type: string) {
-  try {
-    const raw = localStorage.getItem('drakkar-history');
-    const list: { id: string; media_type: string; title: string; poster_path: string; viewed_at: number }[] = raw ? JSON.parse(raw) : [];
-    const filtered = list.filter(h => h.id !== movie.imdbID);
-    filtered.unshift({
-      id: movie.imdbID,
-      media_type: type === 'series' ? 'tv' : 'movie',
-      title: movie.Title,
-      poster_path: movie.Poster,
-      viewed_at: Date.now(),
-    });
-    localStorage.setItem('drakkar-history', JSON.stringify(filtered.slice(0, 30)));
-  } catch {}
-}
 
 function parseActors(actors: string): { name: string }[] {
   if (!actors || actors === 'N/A') return [];
@@ -47,7 +32,12 @@ export default function Detail() {
         const data = await tmdb.getById(id);
         if (data.Response === 'True') {
           setDetail(data);
-          addToHistory(data, type || 'movie');
+          addToHistory({
+            id: data.imdbID,
+            media_type: (type === 'series' ? 'tv' : 'movie') as 'movie' | 'tv',
+            title: data.Title,
+            poster_path: data.Poster,
+          });
         }
       } catch (err) { console.error(err); }
       finally { setLoading(false); }
