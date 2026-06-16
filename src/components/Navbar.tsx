@@ -20,7 +20,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [genresOpen, setGenresOpen] = useState(false);
-  const [donateOpen, setDonateOpen] = useState(false);
   const { watchlist } = useWatchlistContext();
   const navigate = useNavigate();
   const location = useLocation();
@@ -97,10 +96,10 @@ export default function Navbar() {
         </div>
 
         <div className="nb__actions">
-          <button className="nb__donate" onClick={() => setDonateOpen(true)} title={DONATION_CONFIG.message}>
+          <a href={DONATION_CONFIG.paypalUrl} target="_blank" rel="noopener noreferrer" className="nb__donate" title={DONATION_CONFIG.message}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             Donar
-          </button>
+          </a>
           <Link to="/search" className="nb__search" aria-label="Buscar">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           </Link>
@@ -111,43 +110,6 @@ export default function Navbar() {
       </nav>
 
       {mobileOpen && <div className="nb__overlay" onClick={() => setMobileOpen(false)} />}
-
-      {donateOpen && (
-        <div className="donate-modal" onClick={() => setDonateOpen(false)}>
-          <div className="donate-card" onClick={e => e.stopPropagation()}>
-            <button className="donate-close" onClick={() => setDonateOpen(false)}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-            </button>
-
-            <div className="donate-icon">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
-            </div>
-
-            <h2 className="donate-title">Apoya el Proyecto</h2>
-            <p className="donate-sub">Si te gusta Drakkar Movies, considera una donación ☕</p>
-
-            <div className="donate-method">
-              <div className="donate-label">Mach</div>
-              <a href={DONATION_CONFIG.mach.user} target="_blank" rel="noopener noreferrer" className="donate-web-btn">
-                Donar con Mach
-              </a>
-            </div>
-
-            <div className="donate-method">
-              <div className="donate-label">Cuenta RUT - BancoEstado</div>
-              <div className="donate-value">{DONATION_CONFIG.cuentaRut.rut}</div>
-              <div className="donate-holder">Titular: {DONATION_CONFIG.cuentaRut.holder}</div>
-              <button className="donate-copy" onClick={() => navigator.clipboard.writeText(DONATION_CONFIG.cuentaRut.rut)}>
-                Copiar RUT
-              </button>
-            </div>
-
-            <p className="donate-thanks">¡Gracias por tu apoyo! ❤️</p>
-          </div>
-        </div>
-      )}
 
       <style>{`
         .nb {
@@ -323,131 +285,6 @@ export default function Navbar() {
           background: rgba(6,2,15,0.6);
           backdrop-filter: blur(6px);
           z-index: 999;
-        }
-
-        /* Donate modal */
-        .donate-modal {
-          position: fixed;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(6,2,15,0.8);
-          backdrop-filter: blur(8px);
-          z-index: 2000;
-          animation: fadeIn 0.2s;
-          padding: 20px;
-        }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .donate-card {
-          position: relative;
-          background: linear-gradient(160deg, rgba(20,12,40,0.98), rgba(10,6,22,0.98));
-          border: 1px solid rgba(168,85,247,0.15);
-          border-radius: var(--radius-xl);
-          padding: 36px 32px 28px;
-          max-width: 380px;
-          width: 100%;
-          text-align: center;
-          box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 60px rgba(168,85,247,0.08);
-          animation: scaleIn 0.25s;
-        }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .donate-close {
-          position: absolute;
-          top: 12px;
-          right: 12px;
-          width: 32px;
-          height: 32px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(255,255,255,0.05);
-          border: none;
-          border-radius: 8px;
-          color: var(--text-muted);
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        .donate-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .donate-icon {
-          width: 64px;
-          height: 64px;
-          margin: 0 auto 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(251,191,36,0.1));
-          border-radius: 50%;
-          color: #f87171;
-        }
-        .donate-title {
-          font-size: 1.3rem;
-          font-weight: 800;
-          color: #fff;
-          margin: 0 0 6px;
-        }
-        .donate-sub {
-          font-size: 0.82rem;
-          color: var(--text-muted);
-          margin: 0 0 24px;
-        }
-        .donate-method {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid var(--border-subtle);
-          border-radius: var(--radius-md);
-          padding: 16px;
-          margin-bottom: 20px;
-        }
-        .donate-label {
-          font-size: 0.65rem;
-          font-weight: 700;
-          color: var(--accent-purple);
-          text-transform: uppercase;
-          letter-spacing: 1.5px;
-          margin-bottom: 8px;
-        }
-        .donate-value {
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: var(--accent-gold);
-          letter-spacing: 1px;
-          margin-bottom: 4px;
-          word-break: break-all;
-        }
-        .donate-holder {
-          font-size: 0.75rem;
-          color: var(--text-muted);
-          margin-bottom: 12px;
-        }
-        .donate-copy {
-          padding: 7px 18px;
-          background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark));
-          border: none;
-          border-radius: 8px;
-          color: #fff;
-          font-size: 0.75rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        .donate-copy:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(168,85,247,0.3); }
-        .donate-web-btn {
-          display: inline-block;
-          padding: 10px 24px;
-          background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark));
-          border-radius: 10px;
-          color: #fff;
-          font-size: 0.85rem;
-          font-weight: 600;
-          text-decoration: none;
-          margin-bottom: 20px;
-          transition: all 0.2s;
-        }
-        .donate-web-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168,85,247,0.3); }
-        .donate-thanks {
-          font-size: 0.78rem;
-          color: var(--text-muted);
-          margin: 0;
         }
 
         @media (max-width: 768px) {
